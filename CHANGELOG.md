@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.1] - 2025-12-12
+
+### Added
+- **License file (LGPL-3.0)**
+  - Added LICENSE file with GNU Lesser General Public License v3.0
+  - Updated README.md with license information
+  - LGPL-3.0 allows use in proprietary projects while keeping the code open-source
+
 ## [1.2.0] - 2025-12-12
 
 ### Changed
@@ -69,6 +77,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Templates for nodes: function, httpRequest, set, if
 - Base template for PHP
 
+[1.2.1]: https://github.com/JhefersonBR/n8ncoding/releases/tag/v1.2.1
 [1.2.0]: https://github.com/JhefersonBR/n8ncoding/releases/tag/v1.2.0
 [1.1.0]: https://github.com/JhefersonBR/n8ncoding/releases/tag/v1.1.0
 [1.0.0]: https://github.com/JhefersonBR/n8ncoding/releases/tag/v1.0.0
