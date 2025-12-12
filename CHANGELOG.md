@@ -8,6 +8,13 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 ## [Não Lançado]
 
 ### Adicionado
+- **Documentação multilíngue no GitHub Pages**
+  - Estrutura completa do Jekyll com suporte a múltiplos idiomas (inglês e português)
+  - Workflow automático do GitHub Actions para deploy
+  - Automação para sincronizar arquivos `.md` da raiz com documentação Jekyll
+  - Templates HTML com seletor de idioma
+  - CSS personalizado para melhor apresentação
+  - Documentação completa de instalação, uso, contribuição e exemplos
 - Suporte para variáveis de ambiente via arquivo `.env`
 - Scripts de teste automatizados (`tests/test.py`)
 - Documentação de testes (`TESTES.md`)
