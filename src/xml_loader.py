@@ -48,17 +48,23 @@ class XMLLoader:
             print(f"Erro ao carregar template de linguagem: {e}")
             return None
     
-    def load_node_template(self, node_type: str) -> Optional[Dict[str, str]]:
+    def load_node_template(self, node_type: str, language: str = "php") -> Optional[Dict[str, str]]:
         """
-        Carrega o template XML de um tipo de nó.
+        Carrega o template XML de um tipo de nó para uma linguagem específica.
         
         Args:
             node_type: Tipo do nó (ex: 'function', 'httpRequest')
+            language: Linguagem de destino (ex: 'php', 'python', 'javascript')
             
         Returns:
             Dicionário com 'name' e 'method' ou None se não encontrado
         """
-        template_path = self.templates_dir / "nodes" / f"{node_type}.xml"
+        # Tenta primeiro na pasta específica da linguagem
+        template_path = self.templates_dir / "nodes" / language / f"{node_type}.xml"
+        
+        # Se não encontrar, tenta na raiz (para compatibilidade com templates PHP antigos)
+        if not template_path.exists():
+            template_path = self.templates_dir / "nodes" / f"{node_type}.xml"
         
         if not template_path.exists():
             print(f"Template de nó não encontrado: {template_path}")

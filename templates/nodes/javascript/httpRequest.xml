@@ -1,0 +1,38 @@
+<node>
+    <name>httpRequest</name>
+    <method>
+        <![CDATA[
+    /**
+     * Executa uma requisição HTTP
+     */
+    async {{method_name}}() {
+        const fetch = require('node-fetch');
+        
+        const url = {{url}};
+        const method = {{method}};
+        const headers = {{headers}} || {};
+        const body = {{body}};
+        
+        // Executa requisição
+        const response = await fetch(url, {
+            method: method,
+            headers: headers,
+            body: body ? JSON.stringify(body) : undefined,
+            timeout: 30000
+        });
+        
+        // Armazena resposta no contexto
+        try {
+            this.context['{{output_key}}'] = await response.json();
+        } catch (e) {
+            this.context['{{output_key}}'] = {
+                status_code: response.status,
+                text: await response.text(),
+                headers: Object.fromEntries(response.headers.entries())
+            };
+        }
+    }
+        ]]>
+    </method>
+</node>
+

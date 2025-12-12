@@ -1,0 +1,101 @@
+<language>
+    <class>
+        <![CDATA[
+/**
+ * Classe gerada automaticamente pelo n8ncoding
+ * 
+ * Esta classe representa o workflow "{{workflow_name}}" convertido do n8n.
+ * 
+ * @author n8ncoding
+ * @version {{version}}
+ */
+
+{{credentials_require}}
+
+class {{class_name}} {
+    {{constructor}}
+    
+    /**
+     * Executa o workflow
+     * 
+     * Este método executa todos os nós do workflow na ordem correta,
+     * passando dados através do contexto interno.
+     * 
+     * @param {Object} additionalParams - Parâmetros adicionais (opcional)
+     * @returns {Promise<Object>} Resultado final do workflow (geralmente o contexto completo)
+     * @throws {Error} Em caso de erro durante a execução
+     */
+    async run(additionalParams = {}) {
+        try {
+            // Inicializa o contexto com os parâmetros fornecidos
+            this.context = {
+                startTime: Date.now(),
+                workflowName: '{{workflow_name}}',
+                ...this.params,
+                ...additionalParams
+            };
+            
+            // Executa os nós na ordem definida
+            {{steps_calls}}
+            
+            // Adiciona informações de finalização ao contexto
+            this.context.endTime = Date.now();
+            this.context.executionTime = 
+                this.context.endTime - this.context.startTime;
+            
+            return this.context;
+        } catch (error) {
+            // Em caso de erro, adiciona informações ao contexto
+            this.context.error = {
+                message: error.message,
+                name: error.name,
+                stack: error.stack
+            };
+            throw error;
+        }
+    }
+    
+    /**
+     * Obtém o contexto atual do workflow
+     * 
+     * @returns {Object} Contexto atual
+     */
+    getContext() {
+        return this.context;
+    }
+    
+    /**
+     * Define um valor no contexto
+     * 
+     * @param {string} key - Chave do contexto
+     * @param {*} value - Valor a ser armazenado
+     */
+    setContext(key, value) {
+        this.context[key] = value;
+    }
+    
+    /**
+     * Obtém um valor do contexto
+     * 
+     * @param {string} key - Chave do contexto
+     * @param {*} defaultValue - Valor padrão se a chave não existir
+     * @returns {*} Valor do contexto ou valor padrão
+     */
+    getContextValue(key, defaultValue = null) {
+        return this.context[key] ?? defaultValue;
+    }
+    
+    /**
+     * Limpa o contexto do workflow
+     */
+    clearContext() {
+        this.context = {};
+    }
+    
+    {{steps_methods}}
+}
+
+{{module_export}}
+        ]]>
+    </class>
+</language>

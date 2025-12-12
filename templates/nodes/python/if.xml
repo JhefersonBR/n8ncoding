@@ -1,0 +1,22 @@
+<node>
+    <name>if</name>
+    <method>
+        <![CDATA[
+    def {{method_name}}(self) -> None:
+        """
+        Nó IF - Condicional
+        """
+        {{generated_code}}
+        
+        if {{condition}}:
+            # Caminho verdadeiro
+            {{true_branch}}
+        else:
+            # Caminho falso
+            {{false_branch}}
+        
+        self.context['{{output_key}}'] = self.context
+        ]]>
+    </method>
+</node>
+

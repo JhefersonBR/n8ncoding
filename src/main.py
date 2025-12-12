@@ -15,6 +15,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from n8n_client import N8nClient
 from workflow_selector import WorkflowSelector
+from language_selector import LanguageSelector
 from xml_loader import XMLLoader
 from generator import Generator
 
@@ -150,11 +151,18 @@ def main():
         print("Nenhum workflow selecionado. Encerrando.")
         return
     
+    # Permite seleção de linguagens (múltipla escolha)
+    language_selector = LanguageSelector()
+    selected_languages = language_selector.select_languages(default=language)
+    
+    if not selected_languages:
+        print("Nenhuma linguagem selecionada. Encerrando.")
+        return
+    
     # Inicializa componentes de geração
     xml_loader = XMLLoader()
-    generator = Generator(xml_loader, language)
     
-    # Processa cada workflow selecionado
+    # Processa cada workflow selecionado para cada linguagem selecionada
     print("\n" + "=" * 60)
     print("Gerando código...")
     print("=" * 60)
@@ -163,7 +171,9 @@ def main():
         workflow_name = workflow.get('name', 'Workflow sem nome')
         workflow_id = workflow.get('id')
         
-        print(f"\nProcessando: {workflow_name}")
+        print(f"\n{'=' * 60}")
+        print(f"Processando: {workflow_name}")
+        print('=' * 60)
         
         # Busca dados completos do workflow
         full_workflow = client.get_workflow(workflow_id)
@@ -172,18 +182,32 @@ def main():
             print(f"❌ Erro ao buscar dados completos do workflow {workflow_name}")
             continue
         
-        # Gera a classe
-        generated_code = generator.generate_class(full_workflow)
-        
-        if not generated_code:
-            print(f"❌ Erro ao gerar código para {workflow_name}")
-            continue
-        
-        # Salva o arquivo
-        if generator.save_generated_code(full_workflow, generated_code):
-            print(f"✓ {workflow_name} convertido com sucesso!")
-        else:
-            print(f"❌ Erro ao salvar arquivo para {workflow_name}")
+        # Gera código para cada linguagem selecionada
+        for lang in selected_languages:
+            # Obtém o nome da linguagem
+            lang_name = lang.upper()
+            for lang_info in LanguageSelector.AVAILABLE_LANGUAGES.values():
+                if lang_info['code'] == lang:
+                    lang_name = lang_info['name']
+                    break
+            
+            print(f"\n  → Gerando código em {lang_name}...")
+            
+            # Cria gerador para a linguagem específica
+            generator = Generator(xml_loader, lang)
+            
+            # Gera a classe
+            generated_code = generator.generate_class(full_workflow)
+            
+            if not generated_code:
+                print(f"  ❌ Erro ao gerar código {lang_name} para {workflow_name}")
+                continue
+            
+            # Salva o arquivo
+            if generator.save_generated_code(full_workflow, generated_code):
+                print(f"  ✓ {workflow_name} convertido para {lang_name} com sucesso!")
+            else:
+                print(f"  ❌ Erro ao salvar arquivo {lang_name} para {workflow_name}")
     
     print("\n" + "=" * 60)
     print("Conversão concluída!")
