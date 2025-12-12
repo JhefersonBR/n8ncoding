@@ -1,49 +1,45 @@
-# Script PowerShell para criar uma nova branch de feature seguindo GitFlow
-
+# Script para criar nova feature branch
 param(
     [Parameter(Mandatory=$true)]
     [string]$FeatureName
 )
 
-$ErrorActionPreference = "Stop"
+Write-Host "============================================================" -ForegroundColor Cyan
+Write-Host "Criando nova feature: $FeatureName" -ForegroundColor Cyan
+Write-Host "============================================================" -ForegroundColor Cyan
 
-$BranchName = "feature/$FeatureName"
-
-# Verifica se estamos no diretório correto
-if (-not (Test-Path "src/main.py")) {
-    Write-Host "Erro: Execute este script da raiz do projeto" -ForegroundColor Red
+# Verifica se está em um repositório git
+if (-not (Test-Path .git)) {
+    Write-Host "Erro: Não é um repositório Git!" -ForegroundColor Red
     exit 1
-}
-
-# Verifica se develop existe
-$developExists = git show-ref --verify --quiet refs/heads/develop
-if (-not $developExists) {
-    Write-Host "Aviso: Branch develop não existe. Criando..." -ForegroundColor Yellow
-    git checkout -b develop
-    git push -u origin develop
 }
 
 # Atualiza develop
-Write-Host "Atualizando branch develop..." -ForegroundColor Green
+Write-Host "`nAtualizando branch develop..." -ForegroundColor Yellow
 git checkout develop
-git pull origin develop
-
-# Verifica se a branch já existe
-$branchExists = git show-ref --verify --quiet "refs/heads/$BranchName"
-if ($branchExists) {
-    Write-Host "Erro: Branch $BranchName já existe" -ForegroundColor Red
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Erro: Branch develop não encontrada. Crie-a primeiro com: git checkout -b develop" -ForegroundColor Red
     exit 1
 }
 
-# Cria nova branch de feature
-Write-Host "Criando branch $BranchName..." -ForegroundColor Green
-git checkout -b $BranchName
+git pull origin develop
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Aviso: Não foi possível fazer pull. Continuando..." -ForegroundColor Yellow
+}
 
-Write-Host "✓ Branch $BranchName criada com sucesso!" -ForegroundColor Green
-Write-Host "Você está agora na branch $BranchName" -ForegroundColor Yellow
-Write-Host ""
-Write-Host "Próximos passos:"
-Write-Host "  1. Desenvolva sua funcionalidade"
-Write-Host "  2. Faça commits: git add . && git commit -m 'feat: descrição'"
-Write-Host "  3. Quando terminar, use: .\scripts\finish-feature.ps1 $FeatureName"
+# Cria nova feature branch
+$branchName = "feature/$FeatureName"
+Write-Host "`nCriando branch: $branchName" -ForegroundColor Yellow
+git checkout -b $branchName
 
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "`n✓ Feature branch criada com sucesso!" -ForegroundColor Green
+    Write-Host "`nVocê está agora na branch: $branchName" -ForegroundColor Cyan
+    Write-Host "`nPróximos passos:" -ForegroundColor Yellow
+    Write-Host "  1. Desenvolva sua feature"
+    Write-Host "  2. Faça commits: git add . && git commit -m 'feat: descrição'"
+    Write-Host "  3. Quando terminar, execute: .\scripts\finish-feature.ps1 $FeatureName"
+} else {
+    Write-Host "`nErro ao criar branch!" -ForegroundColor Red
+    exit 1
+}

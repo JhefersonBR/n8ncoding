@@ -1,58 +1,53 @@
 #!/bin/bash
-# Script para criar uma nova branch de feature seguindo GitFlow
 
-set -e
+# Script para criar nova feature branch
 
-# Cores para output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
-
-# Verifica se o nome da feature foi fornecido
 if [ -z "$1" ]; then
-    echo -e "${RED}Erro: Nome da feature não fornecido${NC}"
+    echo "Erro: Nome da feature é obrigatório"
     echo "Uso: ./scripts/new-feature.sh nome-da-feature"
-    echo "Exemplo: ./scripts/new-feature.sh adicionar-suporte-python"
     exit 1
 fi
 
-FEATURE_NAME="$1"
+FEATURE_NAME=$1
 BRANCH_NAME="feature/$FEATURE_NAME"
 
-# Verifica se estamos no diretório correto
-if [ ! -f "src/main.py" ]; then
-    echo -e "${RED}Erro: Execute este script da raiz do projeto${NC}"
-    exit 1
-fi
+echo "============================================================"
+echo "Criando nova feature: $FEATURE_NAME"
+echo "============================================================"
 
-# Verifica se develop existe
-if ! git show-ref --verify --quiet refs/heads/develop; then
-    echo -e "${YELLOW}Aviso: Branch develop não existe. Criando...${NC}"
-    git checkout -b develop
-    git push -u origin develop
+# Verifica se está em um repositório git
+if [ ! -d .git ]; then
+    echo "Erro: Não é um repositório Git!"
+    exit 1
 fi
 
 # Atualiza develop
-echo -e "${GREEN}Atualizando branch develop...${NC}"
-git checkout develop
-git pull origin develop
+echo ""
+echo "Atualizando branch develop..."
+git checkout develop || {
+    echo "Erro: Branch develop não encontrada. Crie-a primeiro com: git checkout -b develop"
+    exit 1
+}
 
-# Verifica se a branch já existe
-if git show-ref --verify --quiet refs/heads/"$BRANCH_NAME"; then
-    echo -e "${RED}Erro: Branch $BRANCH_NAME já existe${NC}"
+git pull origin develop || echo "Aviso: Não foi possível fazer pull. Continuando..."
+
+# Cria nova feature branch
+echo ""
+echo "Criando branch: $BRANCH_NAME"
+git checkout -b $BRANCH_NAME
+
+if [ $? -eq 0 ]; then
+    echo ""
+    echo "✓ Feature branch criada com sucesso!"
+    echo ""
+    echo "Você está agora na branch: $BRANCH_NAME"
+    echo ""
+    echo "Próximos passos:"
+    echo "  1. Desenvolva sua feature"
+    echo "  2. Faça commits: git add . && git commit -m 'feat: descrição'"
+    echo "  3. Quando terminar, execute: ./scripts/finish-feature.sh $FEATURE_NAME"
+else
+    echo ""
+    echo "Erro ao criar branch!"
     exit 1
 fi
-
-# Cria nova branch de feature
-echo -e "${GREEN}Criando branch $BRANCH_NAME...${NC}"
-git checkout -b "$BRANCH_NAME"
-
-echo -e "${GREEN}✓ Branch $BRANCH_NAME criada com sucesso!${NC}"
-echo -e "${YELLOW}Você está agora na branch $BRANCH_NAME${NC}"
-echo ""
-echo "Próximos passos:"
-echo "  1. Desenvolva sua funcionalidade"
-echo "  2. Faça commits: git add . && git commit -m 'feat: descrição'"
-echo "  3. Quando terminar, use: ./scripts/finish-feature.sh $FEATURE_NAME"
-
