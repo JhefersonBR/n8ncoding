@@ -1,0 +1,182 @@
+<node>
+    <name>aiAgent</name>
+    <method>
+        <![CDATA[
+    /**
+     * Executa um agente de IA
+     * 
+     * Este método executa um agente de IA usando o prompt e modelo configurados.
+     * Suporta múltiplos provedores de IA (OpenAI, Anthropic, OpenRouter, etc.)
+     * 
+     * @throws {Error} Se houver erro na comunicação com a API de IA
+     */
+    async {{method_name}}() {
+        try {
+            const fetch = require('node-fetch');
+            
+            // Parâmetros do agente
+            const prompt = {{prompt}};
+            const model = {{model}};
+            const temperature = parseFloat({{temperature}});
+            const maxTokens = parseInt({{max_tokens}});
+            const systemMessage = {{system_message}};
+            
+            // Obtém configurações da API (pode ser OpenAI, Anthropic, OpenRouter, etc.)
+            const apiProvider = {{api_provider}};
+            
+            // Usa classe de credenciais apropriada
+            let apiKey = null;
+            let apiUrl = null;
+            let credentials = null;
+            
+            if (apiProvider.toLowerCase().includes('anthropic') || 
+                apiProvider.toLowerCase().includes('claude')) {
+                const { AnthropicCredentials } = require('{{credentials_path_base}}/AnthropicCredentials.js');
+                credentials = new AnthropicCredentials();
+                apiKey = credentials.getApiKey();
+                apiUrl = 'https://api.anthropic.com/v1/messages';
+            } else if (apiProvider.toLowerCase().includes('openrouter')) {
+                const { OpenRouterCredentials } = require('{{credentials_path_base}}/OpenRouterCredentials.js');
+                credentials = new OpenRouterCredentials();
+                apiKey = credentials.getApiKey();
+                apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
+            } else {
+                const { OpenAICredentials } = require('{{credentials_path_base}}/OpenAICredentials.js');
+                credentials = new OpenAICredentials();
+                apiKey = credentials.getApiKey();
+                apiUrl = 'https://api.openai.com/v1/chat/completions';
+            }
+            
+            if (!apiKey) {
+                throw new Error(`API Key para ${apiProvider} não configurada.`);
+            }
+            
+            // Prepara headers
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            };
+            
+            // Headers específicos para Anthropic
+            if (apiProvider.toLowerCase().includes('anthropic')) {
+                headers['anthropic-version'] = '2023-06-01';
+            } else if (apiProvider.toLowerCase().includes('openrouter')) {
+                headers['HTTP-Referer'] = process.env.APP_URL || 'http://localhost';
+                headers['X-Title'] = 'n8ncoding';
+            }
+            
+            // Prepara mensagens
+            const messages = [];
+            
+            // Adiciona mensagem do sistema se fornecida
+            if (systemMessage) {
+                messages.push({
+                    role: 'system',
+                    content: systemMessage
+                });
+            }
+            
+            // Adiciona mensagem do usuário
+            messages.push({
+                role: 'user',
+                content: prompt
+            });
+            
+            // Prepara body da requisição
+            const body = {
+                model: model,
+                messages: messages,
+                temperature: temperature,
+                max_tokens: maxTokens
+            };
+            
+            {{tools_code}}
+            
+            // Executa requisição para API de IA
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(body),
+                timeout: 60000
+            });
+            
+            // Processa resposta
+            if (response.ok) {
+                const responseData = await response.json();
+                
+                // Extrai resposta baseado no formato da API
+                let aiResponse = '';
+                if (responseData.choices && responseData.choices.length > 0) {
+                    // Formato OpenAI
+                    aiResponse = responseData.choices[0].message.content;
+                } else if (responseData.content && responseData.content.length > 0) {
+                    // Formato Anthropic
+                    aiResponse = responseData.content[0].text;
+                } else if (responseData.message && responseData.message.content) {
+                    // Formato alternativo
+                    aiResponse = responseData.message.content;
+                } else {
+                    // Tenta encontrar conteúdo em qualquer lugar
+                    aiResponse = responseData.text || responseData.response || '';
+                }
+                
+                // Armazena resultado no contexto
+                this.context['{{output_key}}'] = {
+                    success: true,
+                    response: aiResponse,
+                    model: model,
+                    provider: apiProvider,
+                    usage: responseData.usage || {},
+                    finish_reason: responseData.choices?.[0]?.finish_reason || null,
+                    raw_response: responseData
+                };
+                
+                // Log de sucesso (opcional)
+                if (this.context.debug) {
+                    console.log(
+                        `AI Agent executado com sucesso: Modelo=${model}, ` +
+                        `Tokens=${responseData.usage?.total_tokens || 0}`
+                    );
+                }
+            } else {
+                // Erro na requisição
+                let errorMessage = `Erro na requisição à API de IA (HTTP ${response.status})`;
+                try {
+                    const errorData = await response.json();
+                    if (errorData.error && errorData.error.message) {
+                        errorMessage += `: ${errorData.error.message}`;
+                    }
+                } catch (e) {
+                    errorMessage += `: ${await response.text()}`;
+                }
+                
+                this.context['{{output_key}}'] = {
+                    success: false,
+                    error: errorMessage,
+                    http_code: response.status,
+                    response: await response.text(),
+                    model: model,
+                    provider: apiProvider
+                };
+                
+                throw new Error(errorMessage);
+            }
+        } catch (error) {
+            // Em caso de erro, armazena no contexto
+            this.context['{{output_key}}'] = {
+                success: false,
+                error: error.message,
+                exception: error.constructor.name,
+                stack: error.stack
+            };
+            
+            // Re-lança a exceção para permitir tratamento externo
+            throw error;
+        }
+        
+        {{additional_code}}
+    }
+        ]]>
+    </method>
+</node>
+

@@ -1,0 +1,24 @@
+<node>
+    <name>if</name>
+    <method>
+        <![CDATA[
+    /**
+     * Nó IF - Condicional
+     */
+    {{method_name}}() {
+        {{generated_code}}
+        
+        if ({{condition}}) {
+            // Caminho verdadeiro
+            {{true_branch}}
+        } else {
+            // Caminho falso
+            {{false_branch}}
+        }
+        
+        this.context['{{output_key}}'] = this.context;
+    }
+        ]]>
+    </method>
+</node>
+

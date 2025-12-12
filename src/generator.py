@@ -21,7 +21,7 @@ class Generator:
             language: Linguagem de destino
         """
         self.xml_loader = xml_loader
-        self.node_mapper = NodeMapper(xml_loader)
+        self.node_mapper = NodeMapper(xml_loader, language)
         self.folder_structure = FolderStructure()
         self.language = language
         self.parameter_extractor = ParameterExtractor()
@@ -93,7 +93,7 @@ class Generator:
         credentials_use = self._generate_credentials_use(workflow)
         
         # Calcula caminho relativo para credenciais
-        credentials_relative_path = self.folder_structure.get_relative_path_from_workflow_to_credentials(workflow)
+        credentials_relative_path = self.folder_structure.get_relative_path_from_workflow_to_credentials(workflow, self.language)
         
         # Substitui placeholders no template
         class_name = self._generate_class_name(workflow)
@@ -106,9 +106,22 @@ class Generator:
         generated_code = generated_code.replace('{{steps_methods}}', steps_methods)
         generated_code = generated_code.replace('{{steps_calls}}', indented_calls)
         generated_code = generated_code.replace('{{constructor}}', constructor_code)
-        generated_code = generated_code.replace('{{credentials_use}}', credentials_use)
+        
+        # Gera código de credenciais
+        credentials_code = self._generate_credentials_code(workflow)
+        generated_code = generated_code.replace('{{credentials_use}}', credentials_code)
+        generated_code = generated_code.replace('{{credentials_import}}', credentials_code)
+        generated_code = generated_code.replace('{{credentials_require}}', credentials_code)
         generated_code = generated_code.replace('{{credentials_path}}', credentials_relative_path)
         generated_code = generated_code.replace('{{version}}', '1.0.0')
+        
+        # Placeholders específicos por linguagem
+        if self.language == "javascript":
+            # Remove o nome do arquivo do caminho para usar como base
+            credentials_path_base = credentials_relative_path.rsplit('/', 1)[0] if '/' in credentials_relative_path else 'credentials'
+            # Substitui em todo o código gerado (incluindo métodos)
+            generated_code = generated_code.replace('{{credentials_path_base}}', credentials_path_base)
+            generated_code = generated_code.replace('{{module_export}}', f'module.exports = {class_name};')
         
         return generated_code
     
@@ -263,7 +276,7 @@ class Generator:
     
     def _generate_constructor(self, params: Dict[str, str]) -> str:
         """
-        Gera código do construtor com parâmetros.
+        Gera código do construtor com parâmetros para a linguagem específica.
         
         Args:
             params: Dicionário com nome => tipo dos parâmetros
@@ -271,6 +284,15 @@ class Generator:
         Returns:
             Código do construtor
         """
+        if self.language == "python":
+            return self._generate_constructor_python(params)
+        elif self.language == "javascript":
+            return self._generate_constructor_javascript(params)
+        else:  # PHP (padrão)
+            return self._generate_constructor_php(params)
+    
+    def _generate_constructor_php(self, params: Dict[str, str]) -> str:
+        """Gera construtor PHP"""
         if not params:
             return """    /**
      * Construtor da classe
@@ -282,7 +304,6 @@ class Generator:
         $this->params = $params;
     }"""
         
-        # Gera documentação dos parâmetros
         param_docs = []
         param_list = []
         
@@ -312,15 +333,72 @@ class Generator:
         
         return constructor
     
-    def _generate_credentials_use(self, workflow: Dict) -> str:
+    def _generate_constructor_python(self, params: Dict[str, str]) -> str:
+        """Gera construtor Python"""
+        constructor_body = []
+        constructor_body.append("        \"\"\"")
+        constructor_body.append("        Inicializa a classe do workflow.")
+        
+        if params:
+            constructor_body.append("")
+            for param_name, param_type in params.items():
+                constructor_body.append(f"        {param_name}: {param_type} - Parâmetro {param_name}")
+        
+        constructor_body.append("        \"\"\"")
+        constructor_body.append("        self.context: Dict[str, Any] = {}")
+        constructor_body.append("        self.params: Dict[str, Any] = {}")
+        
+        if params:
+            constructor_body.append("")
+            for param_name in params.keys():
+                constructor_body.append(f"        self.params['{param_name}'] = kwargs.get('{param_name}')")
+        
+        return '\n'.join(constructor_body)
+    
+    def _generate_constructor_javascript(self, params: Dict[str, str]) -> str:
+        """Gera construtor JavaScript"""
+        if not params:
+            return """     /**
+      * Construtor da classe
+      */
+     constructor() {
+         this.context = {};
+         this.params = {};
+     }"""
+        
+        param_list = []
+        param_docs = []
+        constructor_body = []
+        
+        for param_name, param_type in params.items():
+            param_list.append(f"{param_name} = null")
+            param_docs.append(f"      * @param {{{param_type}}} {param_name} - Parâmetro {param_name}")
+            constructor_body.append(f"         this.params['{param_name}'] = {param_name};")
+        
+        constructor = f"""     /**
+      * Construtor da classe
+      *
+{chr(10).join(param_docs)}
+      */
+     constructor({', '.join(param_list)}) {{
+         this.context = {{}};
+         this.params = {{}};
+         
+{chr(10).join(constructor_body)}
+     }}"""
+        
+        return constructor
+    
+    def _generate_credentials_code(self, workflow: Dict) -> str:
         """
-        Gera código de use statements para classes de credenciais necessárias.
+        Gera código de import/use statements para classes de credenciais necessárias.
+        Suporta PHP, Python e JavaScript.
         
         Args:
             workflow: Dados do workflow
             
         Returns:
-            Código de use statements
+            Código de import/use statements
         """
         nodes = workflow.get('nodes', [])
         credentials_needed = set()
@@ -329,7 +407,6 @@ class Generator:
             node_type = node.get('type', '').lower()
             params = node.get('parameters', {})
             
-            # Detecta qual API está sendo usada
             if 'aiagent' in node_type or 'langchain' in node_type:
                 provider = params.get('provider', 'openai')
                 if isinstance(provider, dict):
@@ -343,13 +420,31 @@ class Generator:
                     credentials_needed.add('OpenAICredentials')
         
         if not credentials_needed:
-            return ""
+            return ''
         
-        use_statements = []
-        for cred in sorted(credentials_needed):
-            use_statements.append(f"use {cred};")
-        
-        return '\n'.join(use_statements) + '\n'
+        if self.language == "python":
+            # Python imports
+            imports = []
+            for cred_class in sorted(list(credentials_needed)):
+                imports.append(f"from {cred_class} import {cred_class}")
+            return '\n'.join(imports)
+        elif self.language == "javascript":
+            # JavaScript requires - o caminho será ajustado no template
+            requires = []
+            for cred_class in sorted(list(credentials_needed)):
+                # Usa placeholder que será substituído com o caminho relativo correto
+                requires.append(f"const {{ {cred_class} }} = require('{{credentials_path_base}}/{cred_class}.js');")
+            return '\n'.join(requires)
+        else:  # PHP
+            # PHP use statements
+            use_statements = []
+            for cred_class in sorted(list(credentials_needed)):
+                use_statements.append(f"use {cred_class};")
+            return '\n'.join(use_statements)
+    
+    def _generate_credentials_use(self, workflow: Dict) -> str:
+        """Alias para compatibilidade"""
+        return self._generate_credentials_code(workflow) + '\n'
     
     def save_generated_code(self, workflow: Dict, code: str) -> bool:
         """
@@ -363,8 +458,8 @@ class Generator:
             True se salvou com sucesso, False caso contrário
         """
         try:
-            # Garante que o arquivo de credenciais existe
-            self.folder_structure.ensure_credentials_file()
+            # Garante que o arquivo de credenciais existe para a linguagem específica
+            self.folder_structure.ensure_credentials_file(self.language)
             
             output_path = self.folder_structure.get_output_file_path(workflow, self.language)
             

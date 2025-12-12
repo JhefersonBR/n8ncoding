@@ -1,0 +1,44 @@
+<node>
+    <name>httpRequest</name>
+    <method>
+        <![CDATA[
+    def {{method_name}}(self) -> None:
+        """
+        Executa uma requisição HTTP
+        
+        Args:
+            url: URL da requisição
+            method: Método HTTP (GET, POST, PUT, DELETE, etc.)
+            headers: Headers HTTP (opcional)
+            body: Corpo da requisição (opcional)
+        """
+        import requests
+        import json
+        
+        url = {{url}}
+        method = {{method}}
+        headers = {{headers}} or {}
+        body = {{body}}
+        
+        # Executa requisição
+        response = requests.request(
+            method=method,
+            url=url,
+            headers=headers,
+            json=body if body else None,
+            timeout=30
+        )
+        
+        # Armazena resposta no contexto
+        try:
+            self.context['{{output_key}}'] = response.json()
+        except json.JSONDecodeError:
+            self.context['{{output_key}}'] = {
+                'status_code': response.status_code,
+                'text': response.text,
+                'headers': dict(response.headers)
+            }
+        ]]>
+    </method>
+</node>
+

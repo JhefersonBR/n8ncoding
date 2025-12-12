@@ -1,0 +1,14 @@
+<node>
+    <name>function</name>
+    <method>
+        <![CDATA[
+    /**
+     * Nó Function - Executa código customizado
+     */
+    {{method_name}}() {
+        {{generated_code}}
+    }
+        ]]>
+    </method>
+</node>
+

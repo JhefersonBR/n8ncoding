@@ -1,0 +1,14 @@
+<node>
+    <name>set</name>
+    <method>
+        <![CDATA[
+    /**
+     * Nó Set - Define valores no contexto
+     */
+    {{method_name}}() {
+        {{generated_code}}
+    }
+        ]]>
+    </method>
+</node>
+

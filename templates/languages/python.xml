@@ -1,0 +1,121 @@
+<language>
+    <class>
+        <![CDATA[
+"""
+Classe gerada automaticamente pelo n8ncoding
+
+Esta classe representa o workflow "{{workflow_name}}" convertido do n8n.
+
+@author n8ncoding
+@version {{version}}
+"""
+import os
+import sys
+from typing import Dict, Any, Optional
+from pathlib import Path
+
+# Adiciona o diretório de credenciais ao path
+import os
+credentials_path = Path(__file__).parent.parent / 'credentials'
+sys.path.insert(0, str(credentials_path))
+
+{{credentials_import}}
+
+class {{class_name}}:
+    """
+    Classe gerada automaticamente pelo n8ncoding
+    
+    Esta classe representa o workflow "{{workflow_name}}" convertido do n8n.
+    """
+    
+    def __init__(self, **kwargs):
+        {{constructor}}
+    
+    def run(self, additional_params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """
+        Executa o workflow.
+        
+        Este método executa todos os nós do workflow na ordem correta,
+        passando dados através do contexto interno.
+        
+        Args:
+            additional_params: Parâmetros adicionais (opcional)
+            
+        Returns:
+            Resultado final do workflow (geralmente o contexto completo)
+            
+        Raises:
+            Exception: Em caso de erro durante a execução
+        """
+        try:
+            # Inicializa o contexto com os parâmetros fornecidos
+            import time
+            self.context = {
+                'start_time': time.time(),
+                'workflow_name': '{{workflow_name}}',
+                **self.params,
+                **(additional_params or {})
+            }
+            
+            # Executa os nós na ordem definida
+            {{steps_calls}}
+            
+            # Adiciona informações de finalização ao contexto
+            self.context['end_time'] = time.time()
+            self.context['execution_time'] = (
+                self.context['end_time'] - self.context['start_time']
+            )
+            
+            return self.context
+        except Exception as e:
+            # Em caso de erro, adiciona informações ao contexto
+            import traceback
+            self.context['error'] = {
+                'message': str(e),
+                'type': type(e).__name__,
+                'traceback': traceback.format_exc()
+            }
+            raise
+    
+    def get_context(self) -> Dict[str, Any]:
+        """
+        Obtém o contexto atual do workflow.
+        
+        Returns:
+            Contexto atual
+        """
+        return self.context
+    
+    def set_context(self, key: str, value: Any) -> None:
+        """
+        Define um valor no contexto.
+        
+        Args:
+            key: Chave do contexto
+            value: Valor a ser armazenado
+        """
+        self.context[key] = value
+    
+    def get_context_value(self, key: str, default: Any = None) -> Any:
+        """
+        Obtém um valor do contexto.
+        
+        Args:
+            key: Chave do contexto
+            default: Valor padrão se a chave não existir
+            
+        Returns:
+            Valor do contexto ou valor padrão
+        """
+        return self.context.get(key, default)
+    
+    def clear_context(self) -> None:
+        """
+        Limpa o contexto do workflow.
+        """
+        self.context = {}
+    
+    {{steps_methods}}
+        ]]>
+    </class>
+</language>

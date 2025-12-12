@@ -1,0 +1,173 @@
+<node>
+    <name>aiAgent</name>
+    <method>
+        <![CDATA[
+    def {{method_name}}(self) -> None:
+        """
+        Executa um agente de IA
+        
+        Este método executa um agente de IA usando o prompt e modelo configurados.
+        Suporta múltiplos provedores de IA (OpenAI, Anthropic, OpenRouter, etc.)
+        
+        Raises:
+            Exception: Se houver erro na comunicação com a API de IA
+        """
+        try:
+            import requests
+            import json
+            
+            # Parâmetros do agente
+            prompt = {{prompt}}
+            model = {{model}}
+            temperature = float({{temperature}})
+            max_tokens = int({{max_tokens}})
+            system_message = {{system_message}}
+            
+            # Obtém configurações da API (pode ser OpenAI, Anthropic, OpenRouter, etc.)
+            api_provider = {{api_provider}}
+            
+            # Usa classe de credenciais apropriada
+            api_key = None
+            api_url = None
+            
+            if 'anthropic' in api_provider.lower() or 'claude' in api_provider.lower():
+                from AnthropicCredentials import AnthropicCredentials
+                credentials = AnthropicCredentials()
+                api_key = credentials.get_api_key()
+                api_url = 'https://api.anthropic.com/v1/messages'
+            elif 'openrouter' in api_provider.lower():
+                from OpenRouterCredentials import OpenRouterCredentials
+                credentials = OpenRouterCredentials()
+                api_key = credentials.get_api_key()
+                api_url = 'https://openrouter.ai/api/v1/chat/completions'
+            else:
+                from OpenAICredentials import OpenAICredentials
+                credentials = OpenAICredentials()
+                api_key = credentials.get_api_key()
+                api_url = 'https://api.openai.com/v1/chat/completions'
+            
+            if not api_key:
+                raise Exception(f"API Key para {api_provider} não configurada.")
+            
+            # Prepara headers
+            headers = {
+                'Content-Type': 'application/json',
+                'Authorization': f'Bearer {api_key}'
+            }
+            
+            # Headers específicos para Anthropic
+            if 'anthropic' in api_provider.lower():
+                headers['anthropic-version'] = '2023-06-01'
+            elif 'openrouter' in api_provider.lower():
+                headers['HTTP-Referer'] = os.getenv('APP_URL', 'http://localhost')
+                headers['X-Title'] = 'n8ncoding'
+            
+            # Prepara mensagens
+            messages = []
+            
+            # Adiciona mensagem do sistema se fornecida
+            if system_message:
+                messages.append({
+                    'role': 'system',
+                    'content': system_message
+                })
+            
+            # Adiciona mensagem do usuário
+            messages.append({
+                'role': 'user',
+                'content': prompt
+            })
+            
+            # Prepara body da requisição
+            body = {
+                'model': model,
+                'messages': messages,
+                'temperature': temperature,
+                'max_tokens': max_tokens
+            }
+            
+            {{tools_code}}
+            
+            # Executa requisição para API de IA
+            response = requests.post(
+                api_url,
+                headers=headers,
+                json=body,
+                timeout=60
+            )
+            
+            # Processa resposta
+            if response.status_code == 200:
+                response_data = response.json()
+                
+                # Extrai resposta baseado no formato da API
+                ai_response = ''
+                if 'choices' in response_data and len(response_data['choices']) > 0:
+                    # Formato OpenAI
+                    ai_response = response_data['choices'][0]['message']['content']
+                elif 'content' in response_data and len(response_data['content']) > 0:
+                    # Formato Anthropic
+                    ai_response = response_data['content'][0]['text']
+                elif 'message' in response_data and 'content' in response_data['message']:
+                    # Formato alternativo
+                    ai_response = response_data['message']['content']
+                else:
+                    # Tenta encontrar conteúdo em qualquer lugar
+                    ai_response = response_data.get('text') or response_data.get('response') or ''
+                
+                # Armazena resultado no contexto
+                self.context['{{output_key}}'] = {
+                    'success': True,
+                    'response': ai_response,
+                    'model': model,
+                    'provider': api_provider,
+                    'usage': response_data.get('usage', {}),
+                    'finish_reason': response_data.get('choices', [{}])[0].get('finish_reason'),
+                    'raw_response': response_data
+                }
+                
+                # Log de sucesso (opcional)
+                if self.context.get('debug'):
+                    import logging
+                    logging.info(
+                        f'AI Agent executado com sucesso: Modelo={model}, '
+                        f'Tokens={response_data.get("usage", {}).get("total_tokens", 0)}'
+                    )
+            else:
+                # Erro na requisição
+                error_message = f'Erro na requisição à API de IA (HTTP {response.status_code})'
+                try:
+                    error_data = response.json()
+                    if 'error' in error_data and 'message' in error_data['error']:
+                        error_message += f": {error_data['error']['message']}"
+                except:
+                    error_message += f": {response.text}"
+                
+                self.context['{{output_key}}'] = {
+                    'success': False,
+                    'error': error_message,
+                    'http_code': response.status_code,
+                    'response': response.text,
+                    'model': model,
+                    'provider': api_provider
+                }
+                
+                raise Exception(error_message)
+        except Exception as e:
+            # Em caso de erro, armazena no contexto
+            import traceback
+            self.context['{{output_key}}'] = {
+                'success': False,
+                'error': str(e),
+                'exception': type(e).__name__,
+                'traceback': traceback.format_exc()
+            }
+            
+            # Re-lança a exceção para permitir tratamento externo
+            raise
+        
+        {{additional_code}}
+        ]]>
+    </method>
+</node>
+

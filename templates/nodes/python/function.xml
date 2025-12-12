@@ -1,0 +1,13 @@
+<node>
+    <name>function</name>
+    <method>
+        <![CDATA[
+    def {{method_name}}(self) -> None:
+        """
+        Nó Function - Executa código customizado
+        """
+        {{generated_code}}
+        ]]>
+    </method>
+</node>
+
