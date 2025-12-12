@@ -1,57 +1,47 @@
 #!/bin/bash
-# Script para criar uma nova branch de hotfix seguindo GitFlow
 
-set -e
+# Script para criar nova hotfix branch
 
-# Cores para output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
-
-# Verifica se o nome do hotfix foi fornecido
 if [ -z "$1" ]; then
-    echo -e "${RED}Erro: Nome do hotfix não fornecido${NC}"
+    echo "Erro: Nome do hotfix é obrigatório"
     echo "Uso: ./scripts/new-hotfix.sh nome-do-hotfix"
-    echo "Exemplo: ./scripts/new-hotfix.sh corrigir-bug-critico"
     exit 1
 fi
 
-HOTFIX_NAME="$1"
+HOTFIX_NAME=$1
 BRANCH_NAME="hotfix/$HOTFIX_NAME"
 
-# Verifica se estamos no diretório correto
-if [ ! -f "src/main.py" ]; then
-    echo -e "${RED}Erro: Execute este script da raiz do projeto${NC}"
-    exit 1
-fi
-
-# Verifica se main existe
-if ! git show-ref --verify --quiet refs/heads/main; then
-    echo -e "${RED}Erro: Branch main não existe${NC}"
-    exit 1
-fi
+echo "============================================================"
+echo "Criando hotfix: $HOTFIX_NAME"
+echo "============================================================"
 
 # Atualiza main
-echo -e "${GREEN}Atualizando branch main...${NC}"
-git checkout main
+echo ""
+echo "Atualizando branch main..."
+git checkout main || {
+    echo "Erro: Branch main não encontrada!"
+    exit 1
+}
+
 git pull origin main
 
-# Verifica se a branch já existe
-if git show-ref --verify --quiet refs/heads/"$BRANCH_NAME"; then
-    echo -e "${RED}Erro: Branch $BRANCH_NAME já existe${NC}"
+# Cria hotfix branch
+echo ""
+echo "Criando branch: $BRANCH_NAME"
+git checkout -b $BRANCH_NAME
+
+if [ $? -eq 0 ]; then
+    echo ""
+    echo "✓ Hotfix branch criada com sucesso!"
+    echo ""
+    echo "Você está agora na branch: $BRANCH_NAME"
+    echo ""
+    echo "Próximos passos:"
+    echo "  1. Corrija o problema urgente"
+    echo "  2. Faça commits: git add . && git commit -m 'fix: descrição da correção'"
+    echo "  3. Quando terminar, execute: ./scripts/finish-hotfix.sh $HOTFIX_NAME"
+else
+    echo ""
+    echo "Erro ao criar branch!"
     exit 1
 fi
-
-# Cria nova branch de hotfix
-echo -e "${GREEN}Criando branch $BRANCH_NAME...${NC}"
-git checkout -b "$BRANCH_NAME"
-
-echo -e "${GREEN}✓ Branch $BRANCH_NAME criada com sucesso!${NC}"
-echo -e "${YELLOW}Você está agora na branch $BRANCH_NAME${NC}"
-echo ""
-echo "Próximos passos:"
-echo "  1. Corrija o bug urgente"
-echo "  2. Faça commits: git add . && git commit -m 'fix: descrição do fix'"
-echo "  3. Quando terminar, use: ./scripts/finish-hotfix.sh $HOTFIX_NAME [versao]"
-

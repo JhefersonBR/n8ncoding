@@ -17,33 +17,117 @@ class NodeMapper:
             xml_loader: Instância do XMLLoader para carregar templates
         """
         self.xml_loader = xml_loader
+        self.expression_parser = None
+    
+    def set_expression_parser(self, parser):
+        """
+        Define o parser de expressões a ser usado.
+        
+        Args:
+            parser: Instância de ExpressionParser
+        """
+        self.expression_parser = parser
     
     def generate_method_name(self, node: Dict) -> str:
         """
-        Gera um nome de método baseado no nó.
+        Gera um nome de método baseado no nome descritivo do nó.
+        Converte para camelCase válido em PHP.
         
         Args:
             node: Dados do nó do workflow
             
         Returns:
-            Nome do método em formato camelCase
+            Nome do método em formato camelCase (ex: 'aiAgent', 'sendEmail', 'updateCrm')
         """
+        # Usa o nome descritivo do nó (não o tipo)
         node_name = node.get('name', 'node')
-        node_type = node.get('type', 'unknown')
         
-        # Remove caracteres especiais e normaliza
-        method_name = node_name.lower().replace(' ', '_').replace('-', '_')
-        method_name = ''.join(c for c in method_name if c.isalnum() or c == '_')
+        if not node_name or node_name.strip() == '':
+            # Fallback: tenta extrair nome do tipo se não houver nome descritivo
+            node_type = node.get('type', 'unknown')
+            # Extrai o último segmento do tipo como fallback
+            parts = node_type.split('.')
+            node_name = parts[-1] if parts else 'node'
+        
+        # Converte para camelCase
+        method_name = self._to_camel_case(node_name)
+        
+        # Garante que começa com letra minúscula (convenção PHP)
+        if method_name and method_name[0].isupper():
+            method_name = method_name[0].lower() + method_name[1:]
         
         # Garante que começa com letra
-        if method_name and not method_name[0].isalpha():
-            method_name = 'node_' + method_name
+        if not method_name or not method_name[0].isalpha():
+            method_name = 'node' + (method_name.capitalize() if method_name else '')
         
-        # Se estiver vazio, usa o tipo
-        if not method_name:
-            method_name = node_type.replace('.', '_')
+        # Evita palavras reservadas do PHP
+        php_reserved = {
+            'if', 'else', 'elseif', 'while', 'for', 'foreach', 'switch', 'case',
+            'default', 'break', 'continue', 'return', 'function', 'class', 'interface',
+            'trait', 'namespace', 'use', 'as', 'public', 'private', 'protected', 'static',
+            'abstract', 'final', 'const', 'var', 'new', 'clone', 'instanceof', 'try',
+            'catch', 'finally', 'throw', 'extends', 'implements', 'self', 'parent',
+            'true', 'false', 'null', 'array', 'string', 'int', 'float', 'bool',
+            'void', 'mixed', 'object', 'callable', 'iterable'
+        }
+        
+        if method_name.lower() in php_reserved:
+            method_name = method_name + 'Node'
         
         return method_name
+    
+    def _to_camel_case(self, text: str) -> str:
+        """
+        Converte um texto para camelCase válido em PHP.
+        Remove acentos e caracteres especiais.
+        
+        Exemplos:
+        - "AI Agent" -> "aiAgent"
+        - "Send Email" -> "sendEmail"
+        - "Update CRM" -> "updateCrm"
+        - "webhook-start" -> "webhookStart"
+        - "Conselheiro Bíblico" -> "conselheiroBiblico"
+        
+        Args:
+            text: Texto a ser convertido
+            
+        Returns:
+            Texto em camelCase válido em PHP
+        """
+        if not text:
+            return 'node'
+        
+        # Remove acentos e caracteres especiais
+        import unicodedata
+        import re
+        
+        # Normaliza para NFD (decompõe caracteres acentuados)
+        text = unicodedata.normalize('NFD', text)
+        # Remove diacríticos (acentos)
+        text = text.encode('ascii', 'ignore').decode('ascii')
+        
+        # Substitui caracteres especiais por espaços
+        text = re.sub(r'[^\w\s]', ' ', text)
+        # Divide por espaços, hífens, underscores
+        words = re.split(r'[\s\-_]+', text)
+        
+        # Remove palavras vazias
+        words = [w for w in words if w]
+        
+        if not words:
+            return 'node'
+        
+        # Primeira palavra em minúscula, demais com primeira letra maiúscula
+        result = words[0].lower()
+        for word in words[1:]:
+            if word:
+                # Capitaliza apenas a primeira letra, mantém resto como está
+                result += word[0].upper() + word[1:].lower()
+        
+        # Remove caracteres não alfanuméricos (mantém apenas letras ASCII e números)
+        result = ''.join(c for c in result if c.isalnum() and ord(c) < 128)
+        
+        return result if result else 'node'
     
     def map_node_to_method(self, node: Dict) -> Optional[str]:
         """
@@ -56,10 +140,19 @@ class NodeMapper:
             Código do método gerado ou None em caso de erro
         """
         node_type = node.get('type', '')
+        original_type = node_type
         
-        # Remove prefixo 'n8n-nodes-' se existir
-        if node_type.startswith('n8n-nodes-'):
+        # Normaliza tipos de AI Agent
+        if 'langchain' in node_type.lower() and 'agent' in node_type.lower():
+            # Tipo LangChain Agent: @n8n/n8n-nodes-langchain.agent
+            node_type = 'aiAgent'
+        elif node_type.startswith('n8n-nodes-'):
             node_type = node_type.replace('n8n-nodes-', '')
+        elif node_type.startswith('@n8n/'):
+            # Remove prefixo @n8n/ e pega apenas o nome do nó
+            parts = node_type.split('.')
+            if len(parts) > 1:
+                node_type = parts[-1]  # Pega a última parte após o ponto
         
         # Carrega o template do nó
         template = self.xml_loader.load_node_template(node_type)
@@ -179,12 +272,89 @@ class NodeMapper:
             except:
                 body_str = 'null'
         
+        # Processa parâmetros específicos do AI Agent
+        prompt = parameters.get('prompt', '') or parameters.get('text', '')
+        if isinstance(prompt, dict):
+            if 'value' in prompt:
+                prompt = prompt['value']
+            elif 'text' in prompt:
+                prompt = prompt['text']
+        prompt_str = f'"{prompt}"' if prompt else '""'
+        
+        model = parameters.get('model', '') or parameters.get('modelName', 'gpt-3.5-turbo')
+        if isinstance(model, dict) and 'value' in model:
+            model = model['value']
+        model_str = f'"{model}"'
+        
+        temperature = parameters.get('temperature', 0.7)
+        if isinstance(temperature, dict) and 'value' in temperature:
+            temperature = temperature['value']
+        temperature_str = str(float(temperature))
+        
+        max_tokens = parameters.get('maxTokens', 1000) or parameters.get('max_tokens', 1000)
+        if isinstance(max_tokens, dict) and 'value' in max_tokens:
+            max_tokens = max_tokens['value']
+        max_tokens_str = str(int(max_tokens))
+        
+        # System message
+        system_message = parameters.get('systemMessage', '') or parameters.get('system_message', '')
+        if isinstance(system_message, dict) and 'value' in system_message:
+            system_message = system_message['value']
+        system_message_str = f'"{system_message}"' if system_message else '""'
+        
+        # API Provider (OpenAI, Anthropic, OpenRouter, etc.)
+        api_provider = parameters.get('provider', 'openai')
+        if isinstance(api_provider, dict) and 'value' in api_provider:
+            api_provider = api_provider['value']
+        api_provider_str = f'"{api_provider}"'
+        
+        # API Key e URL baseado no provider
+        api_key_env = 'OPENAI_API_KEY'
+        api_url_default = 'https://api.openai.com/v1/chat/completions'
+        
+        if 'anthropic' in api_provider.lower() or 'claude' in api_provider.lower():
+            api_key_env = 'ANTHROPIC_API_KEY'
+            api_url_default = 'https://api.anthropic.com/v1/messages'
+        elif 'openrouter' in api_provider.lower():
+            api_key_env = 'OPENROUTER_API_KEY'
+            api_url_default = 'https://openrouter.ai/api/v1/chat/completions'
+        
+        api_key_str = f"getenv('{api_key_env}') ?: ''"
+        api_url_str = f"'{api_url_default}'"
+        
+        # Código para tools (se houver)
+        tools_code = ''
+        tools = parameters.get('tools', []) or parameters.get('availableTools', [])
+        if tools and isinstance(tools, list) and len(tools) > 0:
+            tools_code = "\n            // Tools disponíveis para o agente\n"
+            tools_code += "            $tools = [];\n"
+            for i, tool in enumerate(tools):
+                tool_name = tool.get('name', f'tool_{i}')
+                tool_desc = tool.get('description', '')
+                tools_code += f"            $tools[] = ['name' => '{tool_name}', 'description' => '{tool_desc}'];\n"
+            tools_code += "            $body['tools'] = $tools;\n"
+        
+        # Código adicional para ações/tools do agente (se houver)
+        additional_code = ''
+        if tools and isinstance(tools, list) and len(tools) > 0:
+            additional_code = "\n        // Tools configuradas e disponíveis para uso"
+        
         replacements = {
             '{{output_key}}': output_key,
             '{{url}}': f'"{parameters.get("url", "")}"',
             '{{method}}': f'"{parameters.get("method", "GET")}"',
             '{{headers}}': headers_str,
-            '{{body}}': body_str
+            '{{body}}': body_str,
+            '{{prompt}}': prompt_str,
+            '{{model}}': model_str,
+            '{{temperature}}': temperature_str,
+            '{{max_tokens}}': max_tokens_str,
+            '{{system_message}}': system_message_str,
+            '{{api_provider}}': api_provider_str,
+            '{{api_key}}': api_key_str,
+            '{{api_url}}': api_url_str,
+            '{{tools_code}}': tools_code,
+            '{{additional_code}}': additional_code
         }
         
         for placeholder, value in replacements.items():

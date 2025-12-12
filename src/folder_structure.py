@@ -18,6 +18,10 @@ class FolderStructure:
         """
         self.output_base = Path(output_base)
         self.output_base.mkdir(exist_ok=True)
+        
+        # Cria pasta para credenciais
+        self.credentials_dir = self.output_base / "credentials"
+        self.credentials_dir.mkdir(exist_ok=True)
     
     def get_workflow_folder_path(self, workflow: dict) -> Path:
         """
@@ -34,10 +38,10 @@ class FolderStructure:
         folder_name = folder.get('name', '') if isinstance(folder, dict) else ''
         
         if folder_name:
-            # Se o workflow está em uma pasta, cria a estrutura
+            # Se o workflow está em uma pasta, cria a estrutura em output/
             folder_path = self.output_base / folder_name
         else:
-            # Se não está em pasta, usa a raiz do output
+            # Se não está em pasta, usa output/ diretamente
             folder_path = self.output_base
         
         # Cria a pasta se não existir
@@ -94,4 +98,67 @@ class FolderStructure:
         filename = filename.replace(' ', '_')
         
         return filename
-
+    
+    def get_credentials_path(self) -> Path:
+        """
+        Obtém o caminho do arquivo de credenciais.
+        
+        Returns:
+            Caminho completo do arquivo Credentials.php
+        """
+        return self.credentials_dir / "Credentials.php"
+    
+    def ensure_credentials_file(self) -> bool:
+        """
+        Garante que o arquivo de credenciais existe na pasta de output.
+        Copia do template se necessário.
+        
+        Returns:
+            True se o arquivo existe ou foi criado com sucesso
+        """
+        credentials_path = self.get_credentials_path()
+        
+        # Se já existe, não precisa fazer nada
+        if credentials_path.exists():
+            return True
+        
+        # Tenta copiar do template
+        template_path = Path("templates/credentials/Credentials.php")
+        if template_path.exists():
+            import shutil
+            shutil.copy2(template_path, credentials_path)
+            return True
+        
+        return False
+    
+    def get_relative_path_from_workflow_to_credentials(self, workflow: dict) -> str:
+        """
+        Calcula o caminho relativo de um workflow para o arquivo de credenciais.
+        
+        Os workflows ficam em output/ (ou subpastas) e as credenciais em output/credentials/
+        
+        Args:
+            workflow: Dados do workflow
+            
+        Returns:
+            Caminho relativo (ex: 'credentials/Credentials.php' ou '../credentials/Credentials.php')
+        """
+        workflow_folder = self.get_workflow_folder_path(workflow)
+        
+        # Calcula profundidade da pasta do workflow em relação ao output_base
+        # Exemplo: output/Pasta1 -> depth = 1 (Pasta1)
+        # Exemplo: output -> depth = 0 (raiz)
+        try:
+            relative_path = workflow_folder.relative_to(self.output_base)
+            depth = len(relative_path.parts) if relative_path.parts else 0
+        except ValueError:
+            # Se workflow_folder == output_base, depth = 0
+            depth = 0
+        
+        # Gera caminho relativo: subir 'depth' níveis até output/, depois entrar em credentials/
+        if depth == 0:
+            # Workflow está na raiz de output/, então credentials está em credentials/
+            return 'credentials/Credentials.php'
+        else:
+            # Workflow está em uma subpasta, precisa subir 'depth' níveis até output/
+            return '../' * depth + 'credentials/Credentials.php'

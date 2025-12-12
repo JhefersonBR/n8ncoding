@@ -29,6 +29,7 @@ n8ncoding/
 │   ├── nodes/                 # Templates de tipos de nós
 │   │   ├── httpRequest.xml
 │   │   ├── function.xml
+│   │   ├── aiAgent.xml
 │   │   └── ...
 │   └── languages/             # Templates de linguagens
 │       ├── php.xml
@@ -187,6 +188,45 @@ Este projeto utiliza o padrão **GitFlow** para gerenciamento de branches.
 .\scripts\finish-feature.ps1 nome-da-feature
 ```
 
+## 🌳 GitFlow
+
+Este projeto utiliza o padrão **GitFlow** para gerenciamento de branches.
+
+### Branches Principais
+- **`main`**: Código em produção, sempre estável
+- **`develop`**: Código de desenvolvimento, integração de features
+
+### Branches de Suporte
+- **`feature/*`**: Novas funcionalidades
+- **`release/*`**: Preparação para novas versões
+- **`hotfix/*`**: Correções urgentes
+
+### Scripts Auxiliares
+
+Scripts estão disponíveis em `scripts/` para facilitar o uso do GitFlow:
+
+**Windows (PowerShell):**
+```powershell
+.\scripts\new-feature.ps1 nome-da-feature
+.\scripts\finish-feature.ps1 nome-da-feature
+.\scripts\new-release.ps1 1.0.0
+.\scripts\finish-release.ps1 1.0.0
+.\scripts\new-hotfix.ps1 nome-do-hotfix
+.\scripts\finish-hotfix.ps1 nome-do-hotfix
+```
+
+**Linux/Mac (Bash):**
+```bash
+./scripts/new-feature.sh nome-da-feature
+./scripts/finish-feature.sh nome-da-feature
+./scripts/new-release.sh 1.0.0
+./scripts/finish-release.sh 1.0.0
+./scripts/new-hotfix.sh nome-do-hotfix
+./scripts/finish-hotfix.sh nome-do-hotfix
+```
+
+📖 Veja mais detalhes em [.gitflow.md](.gitflow.md)
+
 ## 📄 Licença
 
 Este projeto é open-source. Consulte o arquivo LICENSE para mais detalhes.
@@ -194,6 +234,13 @@ Este projeto é open-source. Consulte o arquivo LICENSE para mais detalhes.
 ## 🤝 Contribuindo
 
 Contribuições são bem-vindas! Por favor, abra uma issue ou pull request.
+
+**Antes de contribuir:**
+1. Leia o guia de GitFlow em [.gitflow.md](.gitflow.md)
+2. Crie uma branch `feature/nome-da-feature` a partir de `develop`
+3. Siga a convenção de commits (feat:, fix:, docs:, etc.)
+4. Certifique-se de que os testes passam (`python src/test.py`)
+5. Faça merge de volta para `develop`
 
 ## 📌 Roadmap
 

@@ -1,0 +1,172 @@
+<node>
+    <name>aiAgent</name>
+    <method>
+        <![CDATA[
+    /**
+     * Executa um agente de IA
+     * 
+     * Este método executa um agente de IA usando o prompt e modelo configurados.
+     * Suporta múltiplos provedores de IA (OpenAI, Anthropic, OpenRouter, etc.)
+     * 
+     * @return void
+     * @throws \Exception Se houver erro na comunicação com a API de IA
+     */
+    private function {{method_name}}(): void
+    {
+        try {
+            // Parâmetros do agente
+            $prompt = {{prompt}};
+            $model = {{model}};
+            $temperature = {{temperature}};
+            $maxTokens = {{max_tokens}};
+            $systemMessage = {{system_message}};
+            
+            // Obtém configurações da API (pode ser OpenAI, Anthropic, OpenRouter, etc.)
+            $apiProvider = {{api_provider}};
+            
+            // Usa classe de credenciais apropriada
+            $credentials = null;
+            if (strpos($apiProvider, 'anthropic') !== false || strpos($apiProvider, 'claude') !== false) {
+                $credentials = new AnthropicCredentials();
+                $apiUrl = 'https://api.anthropic.com/v1/messages';
+            } elseif (strpos($apiProvider, 'openrouter') !== false) {
+                $credentials = new OpenRouterCredentials();
+                $apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
+            } else {
+                $credentials = new OpenAICredentials();
+                $apiUrl = 'https://api.openai.com/v1/chat/completions';
+            }
+            
+            $apiKey = $credentials->getApiKey();
+            
+            // Prepara headers
+            $headers = [
+                'Content-Type: application/json',
+                'Authorization: Bearer ' . $apiKey
+            ];
+            
+            // Headers específicos para Anthropic
+            if ($credentials instanceof AnthropicCredentials) {
+                $headers[] = 'anthropic-version: 2023-06-01';
+            }
+            
+            // Prepara mensagens
+            $messages = [];
+            
+            // Adiciona mensagem do sistema se fornecida
+            if (!empty($systemMessage)) {
+                $messages[] = [
+                    'role' => 'system',
+                    'content' => $systemMessage
+                ];
+            }
+            
+            // Adiciona mensagem do usuário
+            $messages[] = [
+                'role' => 'user',
+                'content' => $prompt
+            ];
+            
+            // Prepara body da requisição
+            $body = [
+                'model' => $model,
+                'messages' => $messages,
+                'temperature' => (float)$temperature,
+                'max_tokens' => (int)$maxTokens
+            ];
+            
+            {{tools_code}}
+            
+            // Executa requisição para API de IA
+            $ch = curl_init($apiUrl);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
+            curl_setopt($ch, CURLOPT_TIMEOUT, 60); // Timeout de 60 segundos
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+            
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+            
+            // Processa resposta
+            if ($httpCode === 200 && !empty($response)) {
+                $responseData = json_decode($response, true);
+                
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    throw new \Exception('Erro ao decodificar resposta JSON: ' . json_last_error_msg());
+                }
+                
+                // Extrai resposta baseado no formato da API
+                $aiResponse = '';
+                if (isset($responseData['choices'][0]['message']['content'])) {
+                    // Formato OpenAI
+                    $aiResponse = $responseData['choices'][0]['message']['content'];
+                } elseif (isset($responseData['content'][0]['text'])) {
+                    // Formato Anthropic
+                    $aiResponse = $responseData['content'][0]['text'];
+                } elseif (isset($responseData['message']['content'])) {
+                    // Formato alternativo
+                    $aiResponse = $responseData['message']['content'];
+                } else {
+                    // Tenta encontrar conteúdo em qualquer lugar
+                    $aiResponse = $responseData['text'] ?? $responseData['response'] ?? '';
+                }
+                
+                // Armazena resultado no contexto
+                $this->context['{{output_key}}'] = [
+                    'success' => true,
+                    'response' => $aiResponse,
+                    'model' => $model,
+                    'provider' => $apiProvider,
+                    'usage' => $responseData['usage'] ?? [],
+                    'finish_reason' => $responseData['choices'][0]['finish_reason'] ?? null,
+                    'raw_response' => $responseData
+                ];
+                
+                // Log de sucesso (opcional)
+                if (isset($this->context['debug']) && $this->context['debug'] === true) {
+                    error_log(sprintf(
+                        'AI Agent executado com sucesso: Modelo=%s, Tokens=%d',
+                        $model,
+                        $responseData['usage']['total_tokens'] ?? 0
+                    ));
+                }
+            } else {
+                // Erro na requisição
+                $errorMessage = 'Erro na requisição à API de IA';
+                if (!empty($curlError)) {
+                    $errorMessage .= ': ' . $curlError;
+                }
+                
+                $this->context['{{output_key}}'] = [
+                    'success' => false,
+                    'error' => $errorMessage,
+                    'http_code' => $httpCode,
+                    'response' => $response,
+                    'model' => $model,
+                    'provider' => $apiProvider
+                ];
+                
+                throw new \Exception($errorMessage . ' (HTTP ' . $httpCode . ')');
+            }
+        } catch (\Exception $e) {
+            // Em caso de erro, armazena no contexto
+            $this->context['{{output_key}}'] = [
+                'success' => false,
+                'error' => $e->getMessage(),
+                'exception' => get_class($e),
+                'trace' => $e->getTraceAsString()
+            ];
+            
+            // Re-lança a exceção para permitir tratamento externo
+            throw $e;
+        }
+        
+        {{additional_code}}
+    }
+        ]]>
+    </method>
+</node>
