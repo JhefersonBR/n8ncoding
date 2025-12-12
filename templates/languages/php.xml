@@ -3,17 +3,108 @@
         <![CDATA[
 <?php
 
+/**
+ * Classe gerada automaticamente pelo n8ncoding
+ * 
+ * Esta classe representa o workflow "{{workflow_name}}" convertido do n8n.
+ * 
+ * @package Generated
+ * @author n8ncoding
+ * @version {{version}}
+ */
 class {{class_name}} {
 
+    /**
+     * Contexto interno para armazenar dados entre nós
+     * 
+     * @var array
+     */
     private array $context = [];
 
+    /**
+     * Executa o workflow
+     * 
+     * Este método executa todos os nós do workflow na ordem correta,
+     * passando dados através do contexto interno.
+     * 
+     * @param array $params Parâmetros iniciais para o workflow
+     * @return mixed Resultado final do workflow (geralmente o contexto completo)
+     * @throws \Exception Em caso de erro durante a execução
+     */
     public function run(array $params = []): mixed
     {
-        $this->context = $params;
+        try {
+            // Inicializa o contexto com os parâmetros fornecidos
+            $this->context = array_merge([
+                'start_time' => microtime(true),
+                'workflow_name' => '{{workflow_name}}',
+            ], $params);
 
-        {{steps_calls}}
+            // Executa os nós na ordem definida
+            {{steps_calls}}
 
+            // Adiciona informações de finalização ao contexto
+            $this->context['end_time'] = microtime(true);
+            $this->context['execution_time'] = 
+                $this->context['end_time'] - $this->context['start_time'];
+
+            return $this->context;
+        } catch (\Exception $e) {
+            // Em caso de erro, adiciona informações ao contexto
+            $this->context['error'] = [
+                'message' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ];
+            
+            throw $e;
+        }
+    }
+
+    /**
+     * Obtém o contexto atual do workflow
+     * 
+     * @return array Contexto atual
+     */
+    public function getContext(): array
+    {
         return $this->context;
+    }
+
+    /**
+     * Define um valor no contexto
+     * 
+     * @param string $key Chave do contexto
+     * @param mixed $value Valor a ser armazenado
+     * @return void
+     */
+    public function setContext(string $key, mixed $value): void
+    {
+        $this->context[$key] = $value;
+    }
+
+    /**
+     * Obtém um valor do contexto
+     * 
+     * @param string $key Chave do contexto
+     * @param mixed $default Valor padrão se a chave não existir
+     * @return mixed Valor do contexto ou valor padrão
+     */
+    public function getContextValue(string $key, mixed $default = null): mixed
+    {
+        return $this->context[$key] ?? $default;
+    }
+
+    /**
+     * Limpa o contexto do workflow
+     * 
+     * @return void
+     */
+    public function clearContext(): void
+    {
+        $this->context = [];
     }
 
     {{steps_methods}}
@@ -21,4 +112,3 @@ class {{class_name}} {
         ]]>
     </class>
 </language>
-

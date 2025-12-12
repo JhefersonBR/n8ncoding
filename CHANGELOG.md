@@ -13,6 +13,20 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 - Documentação de testes (`TESTES.md`)
 - Padrão GitFlow com scripts auxiliares
 - Guia de GitFlow (`.gitflow.md`)
+- **Template PHP completo para nó AI Agent** (`templates/nodes/aiAgent.xml`)
+  - Geração de código PHP profissional com PHPDoc
+  - Suporte para múltiplos provedores: OpenAI, Anthropic, OpenRouter
+  - Suporte para system messages e tools/funções
+  - Tratamento robusto de erros com try/catch
+  - Suporte a diferentes formatos de resposta da API
+  - Logging e debug opcional
+  - Timeout configurável
+  - Suporte para tipos LangChain (`@n8n/n8n-nodes-langchain.agent`)
+- Template PHP melhorado (`templates/languages/php.xml`)
+  - Documentação PHPDoc completa
+  - Métodos helper (getContext, setContext, etc.)
+  - Tratamento de erros no método run()
+  - Rastreamento de tempo de execução
 
 ### Alterado
 - `config/settings.json` agora usa referências a variáveis de ambiente

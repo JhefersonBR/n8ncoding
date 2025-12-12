@@ -29,6 +29,7 @@ n8ncoding/
 │   ├── nodes/                 # Templates de tipos de nós
 │   │   ├── httpRequest.xml
 │   │   ├── function.xml
+│   │   ├── aiAgent.xml
 │   │   └── ...
 │   └── languages/             # Templates de linguagens
 │       ├── php.xml

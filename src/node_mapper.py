@@ -56,10 +56,19 @@ class NodeMapper:
             Código do método gerado ou None em caso de erro
         """
         node_type = node.get('type', '')
+        original_type = node_type
         
-        # Remove prefixo 'n8n-nodes-' se existir
-        if node_type.startswith('n8n-nodes-'):
+        # Normaliza tipos de AI Agent
+        if 'langchain' in node_type.lower() and 'agent' in node_type.lower():
+            # Tipo LangChain Agent: @n8n/n8n-nodes-langchain.agent
+            node_type = 'aiAgent'
+        elif node_type.startswith('n8n-nodes-'):
             node_type = node_type.replace('n8n-nodes-', '')
+        elif node_type.startswith('@n8n/'):
+            # Remove prefixo @n8n/ e pega apenas o nome do nó
+            parts = node_type.split('.')
+            if len(parts) > 1:
+                node_type = parts[-1]  # Pega a última parte após o ponto
         
         # Carrega o template do nó
         template = self.xml_loader.load_node_template(node_type)
@@ -179,12 +188,89 @@ class NodeMapper:
             except:
                 body_str = 'null'
         
+        # Processa parâmetros específicos do AI Agent
+        prompt = parameters.get('prompt', '') or parameters.get('text', '')
+        if isinstance(prompt, dict):
+            if 'value' in prompt:
+                prompt = prompt['value']
+            elif 'text' in prompt:
+                prompt = prompt['text']
+        prompt_str = f'"{prompt}"' if prompt else '""'
+        
+        model = parameters.get('model', '') or parameters.get('modelName', 'gpt-3.5-turbo')
+        if isinstance(model, dict) and 'value' in model:
+            model = model['value']
+        model_str = f'"{model}"'
+        
+        temperature = parameters.get('temperature', 0.7)
+        if isinstance(temperature, dict) and 'value' in temperature:
+            temperature = temperature['value']
+        temperature_str = str(float(temperature))
+        
+        max_tokens = parameters.get('maxTokens', 1000) or parameters.get('max_tokens', 1000)
+        if isinstance(max_tokens, dict) and 'value' in max_tokens:
+            max_tokens = max_tokens['value']
+        max_tokens_str = str(int(max_tokens))
+        
+        # System message
+        system_message = parameters.get('systemMessage', '') or parameters.get('system_message', '')
+        if isinstance(system_message, dict) and 'value' in system_message:
+            system_message = system_message['value']
+        system_message_str = f'"{system_message}"' if system_message else '""'
+        
+        # API Provider (OpenAI, Anthropic, OpenRouter, etc.)
+        api_provider = parameters.get('provider', 'openai')
+        if isinstance(api_provider, dict) and 'value' in api_provider:
+            api_provider = api_provider['value']
+        api_provider_str = f'"{api_provider}"'
+        
+        # API Key e URL baseado no provider
+        api_key_env = 'OPENAI_API_KEY'
+        api_url_default = 'https://api.openai.com/v1/chat/completions'
+        
+        if 'anthropic' in api_provider.lower() or 'claude' in api_provider.lower():
+            api_key_env = 'ANTHROPIC_API_KEY'
+            api_url_default = 'https://api.anthropic.com/v1/messages'
+        elif 'openrouter' in api_provider.lower():
+            api_key_env = 'OPENROUTER_API_KEY'
+            api_url_default = 'https://openrouter.ai/api/v1/chat/completions'
+        
+        api_key_str = f"getenv('{api_key_env}') ?: ''"
+        api_url_str = f"'{api_url_default}'"
+        
+        # Código para tools (se houver)
+        tools_code = ''
+        tools = parameters.get('tools', []) or parameters.get('availableTools', [])
+        if tools and isinstance(tools, list) and len(tools) > 0:
+            tools_code = "\n            // Tools disponíveis para o agente\n"
+            tools_code += "            $tools = [];\n"
+            for i, tool in enumerate(tools):
+                tool_name = tool.get('name', f'tool_{i}')
+                tool_desc = tool.get('description', '')
+                tools_code += f"            $tools[] = ['name' => '{tool_name}', 'description' => '{tool_desc}'];\n"
+            tools_code += "            $body['tools'] = $tools;\n"
+        
+        # Código adicional para ações/tools do agente (se houver)
+        additional_code = ''
+        if tools and isinstance(tools, list) and len(tools) > 0:
+            additional_code = "\n        // Tools configuradas e disponíveis para uso"
+        
         replacements = {
             '{{output_key}}': output_key,
             '{{url}}': f'"{parameters.get("url", "")}"',
             '{{method}}': f'"{parameters.get("method", "GET")}"',
             '{{headers}}': headers_str,
-            '{{body}}': body_str
+            '{{body}}': body_str,
+            '{{prompt}}': prompt_str,
+            '{{model}}': model_str,
+            '{{temperature}}': temperature_str,
+            '{{max_tokens}}': max_tokens_str,
+            '{{system_message}}': system_message_str,
+            '{{api_provider}}': api_provider_str,
+            '{{api_key}}': api_key_str,
+            '{{api_url}}': api_url_str,
+            '{{tools_code}}': tools_code,
+            '{{additional_code}}': additional_code
         }
         
         for placeholder, value in replacements.items():

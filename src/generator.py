@@ -59,7 +59,7 @@ class Generator:
             if method_code:
                 methods.append(method_code)
                 method_name = self.node_mapper.generate_method_name(node)
-                method_calls.append(f"        $this->{method_name}();")
+                method_calls.append(f"$this->{method_name}();")
         
         # Substitui placeholders no template
         class_name = self._generate_class_name(workflow)
@@ -100,9 +100,23 @@ class Generator:
             for other_node in nodes:
                 connections = other_node.get('connections', {})
                 for output_key, output_connections in connections.items():
-                    for connection_list in output_connections.values():
+                    # output_connections pode ser dict ou list
+                    if isinstance(output_connections, dict):
+                        connection_lists = output_connections.values()
+                    elif isinstance(output_connections, list):
+                        connection_lists = output_connections
+                    else:
+                        continue
+                    
+                    for connection_list in connection_lists:
+                        if not isinstance(connection_list, list):
+                            connection_list = [connection_list]
                         for connection in connection_list:
-                            if connection.get('node') == node_id:
+                            if isinstance(connection, dict):
+                                if connection.get('node') == node_id:
+                                    has_input_connections = True
+                                    break
+                            elif isinstance(connection, str) and connection == node_id:
                                 has_input_connections = True
                                 break
                         if has_input_connections:
@@ -143,11 +157,25 @@ class Generator:
             # Depois visita os nós conectados (próximos na sequência)
             connections = node.get('connections', {})
             for output_key, output_connections in connections.items():
-                for connection_list in output_connections.values():
+                # output_connections pode ser dict ou list
+                if isinstance(output_connections, dict):
+                    connection_lists = output_connections.values()
+                elif isinstance(output_connections, list):
+                    connection_lists = output_connections
+                else:
+                    continue
+                
+                for connection_list in connection_lists:
+                    if not isinstance(connection_list, list):
+                        connection_list = [connection_list]
                     for connection in connection_list:
-                        target_node_id = connection.get('node')
-                        if target_node_id and target_node_id not in visited:
-                            visit_node(target_node_id)
+                        # connection pode ser dict ou string (node_id direto)
+                        if isinstance(connection, dict):
+                            target_node_id = connection.get('node')
+                            if target_node_id and target_node_id not in visited:
+                                visit_node(target_node_id)
+                        elif isinstance(connection, str) and connection not in visited:
+                            visit_node(connection)
         
         # Visita todos os nós iniciais
         for start_node in start_nodes:
