@@ -2,6 +2,20 @@
 
 Conversor de workflows do n8n para classes de código em várias linguagens.
 
+## 📚 Documentation / Documentação
+
+**English:** Full multilingual documentation is available on GitHub Pages:
+- **Home:** [https://jhefersonbr.github.io/n8ncoding/](https://jhefersonbr.github.io/n8ncoding/)
+- **English (default):** [https://jhefersonbr.github.io/n8ncoding/en/](https://jhefersonbr.github.io/n8ncoding/en/)
+- **Português:** [https://jhefersonbr.github.io/n8ncoding/pt/](https://jhefersonbr.github.io/n8ncoding/pt/)
+
+**Português:** Documentação multilíngue completa disponível no GitHub Pages:
+- **Início:** [https://jhefersonbr.github.io/n8ncoding/](https://jhefersonbr.github.io/n8ncoding/)
+- **Inglês (padrão):** [https://jhefersonbr.github.io/n8ncoding/en/](https://jhefersonbr.github.io/n8ncoding/en/)
+- **Português:** [https://jhefersonbr.github.io/n8ncoding/pt/](https://jhefersonbr.github.io/n8ncoding/pt/)
+
+---
+
 ## 📋 Descrição
 
 O **n8ncoding** é uma ferramenta open-source que permite converter workflows do n8n em classes de código reutilizáveis. Atualmente suporta PHP, com planos para expandir para outras linguagens.

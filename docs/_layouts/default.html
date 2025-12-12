@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: site.default_lang }}">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if page.title %}{{ page.title }} | {% endif %}{{ site.title }}</title>
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+  {% seo %}
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrapper">
+      <a class="site-title" href="{{ '/' | relative_url }}">{{ site.title }}</a>
+      <nav class="site-nav">
+        <div class="trigger">
+          <a class="page-link" href="{{ '/en/' | relative_url }}">English</a>
+          <a class="page-link" href="{{ '/pt/' | relative_url }}">Português</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-content">
+    <div class="wrapper">
+      <div class="language-selector">
+        {% assign current_lang = page.lang | default: site.default_lang %}
+        {% for lang in site.languages %}
+          {% if lang == current_lang %}
+            <strong>{{ lang | upcase }}</strong>
+          {% else %}
+            {% if page.ref %}
+              {% assign lang_page = site.pages | where: "lang", lang | where: "ref", page.ref | first %}
+              {% if lang_page %}
+                <a href="{{ lang_page.url | relative_url }}">{{ lang | upcase }}</a>
+              {% else %}
+                <a href="{{ site.baseurl }}/{{ lang }}/">{{ lang | upcase }}</a>
+              {% endif %}
+            {% else %}
+              <a href="{{ site.baseurl }}/{{ lang }}/">{{ lang | upcase }}</a>
+            {% endif %}
+          {% endif %}
+          {% unless forloop.last %} | {% endunless %}
+        {% endfor %}
+      </div>
+      
+      {{ content }}
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrapper">
+      <p>&copy; {{ site.time | date: '%Y' }} {{ site.title }}. All rights reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>
+

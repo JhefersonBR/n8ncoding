@@ -1,0 +1,37 @@
+# Site settings
+title: n8ncoding Documentation
+description: Converter n8n workflows to code classes in multiple languages
+baseurl: "/n8ncoding"
+url: "https://jhefersonbr.github.io"
+github_username: jhefersonbr
+
+# Language settings
+languages: ["en", "pt"]
+default_lang: "en"
+exclude_from_localization: ["images", "assets"]
+
+# Theme
+theme: minima
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+# Navigation
+header_pages:
+  - index.md
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+sass:
+  style: compressed
+
+# Exclude
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+  - .gitignore
+  - README.md
