@@ -161,49 +161,17 @@ private function {{method_name}}(): void
 
 ## 🌿 GitFlow
 
-Este projeto utiliza o padrão **GitFlow** para gerenciamento de branches.
+Este projeto utiliza o padrão **GitFlow** para gerenciamento de branches e releases.
 
-**Branches principais:**
-- `main` - Código em produção
-- `develop` - Código em desenvolvimento
+### Estrutura de Branches
 
-**Branches de suporte:**
-- `feature/` - Novas funcionalidades
-- `release/` - Preparação para releases
-- `hotfix/` - Correções urgentes
-
-📖 Veja [GITFLOW.md](GITFLOW.md) para documentação completa.
-
-**Scripts auxiliares (Linux/Mac):**
-```bash
-./scripts/new-feature.sh nome-da-feature
-./scripts/finish-feature.sh nome-da-feature
-./scripts/new-release.sh versao
-./scripts/finish-release.sh versao
-```
-
-**Scripts auxiliares (Windows PowerShell):**
-```powershell
-.\scripts\new-feature.ps1 nome-da-feature
-.\scripts\finish-feature.ps1 nome-da-feature
-```
-
-## 🌳 GitFlow
-
-Este projeto utiliza o padrão **GitFlow** para gerenciamento de branches.
-
-### Branches Principais
-- **`main`**: Código em produção, sempre estável
-- **`develop`**: Código de desenvolvimento, integração de features
-
-### Branches de Suporte
-- **`feature/*`**: Novas funcionalidades
-- **`release/*`**: Preparação para novas versões
-- **`hotfix/*`**: Correções urgentes
+- **`main`** - Código em produção (sempre estável)
+- **`develop`** - Código em desenvolvimento (branch principal)
+- **`feature/*`** - Novas funcionalidades
+- **`release/*`** - Preparação para releases
+- **`hotfix/*`** - Correções urgentes em produção
 
 ### Scripts Auxiliares
-
-Scripts estão disponíveis em `scripts/` para facilitar o uso do GitFlow:
 
 **Windows (PowerShell):**
 ```powershell
@@ -225,7 +193,10 @@ Scripts estão disponíveis em `scripts/` para facilitar o uso do GitFlow:
 ./scripts/finish-hotfix.sh nome-do-hotfix
 ```
 
-📖 Veja mais detalhes em [.gitflow.md](.gitflow.md)
+### Documentação Completa
+
+- 📖 **[GITFLOW.md](GITFLOW.md)** - Guia completo do GitFlow com exemplos práticos
+- 📖 **[CONTRIBUTING.md](CONTRIBUTING.md)** - Guia detalhado de como contribuir com o projeto
 
 ## 📄 Licença
 
@@ -236,11 +207,12 @@ Este projeto é open-source. Consulte o arquivo LICENSE para mais detalhes.
 Contribuições são bem-vindas! Por favor, abra uma issue ou pull request.
 
 **Antes de contribuir:**
-1. Leia o guia de GitFlow em [.gitflow.md](.gitflow.md)
-2. Crie uma branch `feature/nome-da-feature` a partir de `develop`
-3. Siga a convenção de commits (feat:, fix:, docs:, etc.)
-4. Certifique-se de que os testes passam (`python src/test.py`)
-5. Faça merge de volta para `develop`
+1. Leia o guia completo em [CONTRIBUTING.md](CONTRIBUTING.md)
+2. Leia o guia de GitFlow em [GITFLOW.md](GITFLOW.md)
+3. Crie uma branch `feature/nome-da-feature` a partir de `develop`
+4. Siga a convenção de commits (feat:, fix:, docs:, etc.)
+5. Certifique-se de que os testes passam (`python src/test.py`)
+6. Faça merge de volta para `develop`
 
 ## 📌 Roadmap
 
