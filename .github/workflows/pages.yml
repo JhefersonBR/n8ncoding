@@ -39,8 +39,8 @@ jobs:
       - name: Check for MD file changes
         id: check-changes
         run: |
-          # Lista de arquivos .md mapeados que podem ter sido alterados
-          MAPPED_FILES="EXEMPLO_USO.md ENV_SETUP.md CONTRIBUTING.md GITFLOW.md TESTES.md CHANGELOG.md EXEMPLO_AI_AGENT.md EXEMPLO_CONSTRUTOR_CREDENCIAIS.md"
+          # Lista de arquivos .md mapeados que podem ter sido alterados (em inglês na raiz)
+          MAPPED_FILES="USAGE.md ENV_SETUP.md CONTRIBUTING.md GITFLOW.md TESTING.md CHANGELOG.md AI_AGENT_EXAMPLE.md CREDENTIALS_CONSTRUCTOR_EXAMPLE.md"
           
           # Verifica se algum arquivo mapeado foi alterado neste commit
           CHANGED_FILES=""

@@ -1,11 +1,3 @@
----
-layout: page
-title: Guia de Uso
-lang: pt
-ref: usage
-permalink: /pt/usage/
----
-
 # Usage Guide
 
 This guide shows how to use **n8ncoding** to convert n8n workflows into code classes in multiple languages.

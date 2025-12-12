@@ -1,11 +1,3 @@
----
-layout: page
-title: Exemplo Construtor de Credenciais
-lang: pt
-ref: credentials-constructor
-permalink: /pt/examples/credentials-constructor/
----
-
 # Example: Constructor with Parameters and Credential Classes
 
 This document explains the new features implemented.

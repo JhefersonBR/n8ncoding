@@ -1,11 +1,3 @@
----
-layout: page
-title: Guia de Testes
-lang: pt
-ref: testing
-permalink: /pt/testing/
----
-
 # n8ncoding Testing Guide
 
 This document explains how to run tests for the n8ncoding application.

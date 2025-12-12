@@ -7,16 +7,17 @@ para os arquivos Jekyll em português, preservando o front matter.
 import os
 from pathlib import Path
 
-# Mapeamento de arquivos originais para arquivos Jekyll
+# Mapeamento de arquivos originais (em inglês) para arquivos Jekyll (em português)
+# Os arquivos na raiz estão em inglês, mas são copiados para docs/pt/ mantendo o front matter
 MAPPINGS = {
-    'EXEMPLO_USO.md': 'docs/pt/usage.md',
+    'USAGE.md': 'docs/pt/usage.md',
     'ENV_SETUP.md': 'docs/pt/env-setup.md',
     'CONTRIBUTING.md': 'docs/pt/contributing.md',
     'GITFLOW.md': 'docs/pt/gitflow.md',
-    'TESTES.md': 'docs/pt/testing.md',
+    'TESTING.md': 'docs/pt/testing.md',
     'CHANGELOG.md': 'docs/pt/changelog.md',
-    'EXEMPLO_AI_AGENT.md': 'docs/pt/examples/ai-agent.md',
-    'EXEMPLO_CONSTRUTOR_CREDENCIAIS.md': 'docs/pt/examples/credentials-constructor.md',
+    'AI_AGENT_EXAMPLE.md': 'docs/pt/examples/ai-agent.md',
+    'CREDENTIALS_CONSTRUCTOR_EXAMPLE.md': 'docs/pt/examples/credentials-constructor.md',
 }
 
 def extract_front_matter(content: str) -> tuple[str, str]:
