@@ -32,11 +32,11 @@ env/
 *.swo
 *~
 
-# Output
+# Output - apenas arquivos gerados
 output/
-*.php
-*.py
-*.js
+output/**/*.php
+output/**/*.py
+output/**/*.js
 
 # Environment variables
 .env
