@@ -9,14 +9,16 @@ from xml_loader import XMLLoader
 class NodeMapper:
     """Classe para mapear nós do workflow em métodos de código."""
     
-    def __init__(self, xml_loader: XMLLoader):
+    def __init__(self, xml_loader: XMLLoader, language: str = "php"):
         """
         Inicializa o mapeador de nós.
         
         Args:
             xml_loader: Instância do XMLLoader para carregar templates
+            language: Linguagem de destino (ex: 'php', 'python', 'javascript')
         """
         self.xml_loader = xml_loader
+        self.language = language
         self.expression_parser = None
     
     def set_expression_parser(self, parser):
@@ -154,8 +156,8 @@ class NodeMapper:
             if len(parts) > 1:
                 node_type = parts[-1]  # Pega a última parte após o ponto
         
-        # Carrega o template do nó
-        template = self.xml_loader.load_node_template(node_type)
+        # Carrega o template do nó para a linguagem específica
+        template = self.xml_loader.load_node_template(node_type, self.language)
         
         if not template:
             # Template padrão se não encontrar específico
