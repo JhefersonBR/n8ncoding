@@ -300,7 +300,7 @@ git merge develop
 
 ```bash
 # Execute testes
-python src/test.py
+python tests/test.py
 
 # Teste manual
 python src/main.py
@@ -359,7 +359,7 @@ git commit -m "chore: prepara release v1.0.0
 
 ```bash
 # Execute todos os testes
-python src/test.py
+python tests/test.py
 
 # Teste de integração completo
 python src/main.py
@@ -433,7 +433,7 @@ git commit -m "fix: corrige IndexError na ordenação de nós
 
 ```bash
 # Criar teste específico
-python src/test.py
+python tests/test.py
 
 # Testar com workflow sem conexões
 python src/main.py

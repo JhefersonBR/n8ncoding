@@ -9,7 +9,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 - Suporte para variáveis de ambiente via arquivo `.env`
-- Scripts de teste automatizados (`src/test.py`)
+- Scripts de teste automatizados (`tests/test.py`)
 - Documentação de testes (`TESTES.md`)
 - Padrão GitFlow com scripts auxiliares
 - Guia de GitFlow (`.gitflow.md`)

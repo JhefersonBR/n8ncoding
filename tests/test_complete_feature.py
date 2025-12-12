@@ -4,7 +4,7 @@ Teste completo da nova funcionalidade: construtor com parâmetros e classes de c
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
 
 from xml_loader import XMLLoader
 from generator import Generator

@@ -9,7 +9,7 @@ Este documento explica como executar testes da aplicação n8ncoding.
 Execute o script de teste que valida todos os componentes:
 
 ```bash
-python src/test.py
+python tests/test.py
 ```
 
 Este script executa:
@@ -119,7 +119,7 @@ Escolha os workflows que deseja converter:
 **Solução:**
 - Verifique se a pasta `templates/` existe
 - Verifique se os arquivos `php.xml`, `function.xml`, etc. existem
-- Execute `python src/test.py` para verificar
+- Execute `python tests/test.py` para verificar
 
 ### Erro: "Não foi possível conectar ao n8n"
 
@@ -128,7 +128,7 @@ Escolha os workflows que deseja converter:
 **Solução:**
 - Verifique se o n8n está rodando: `http://localhost:5678`
 - Verifique o arquivo `.env` com as credenciais corretas
-- Use `python src/test.py` para testar sem n8n
+- Use `python tests/test.py` para testar sem n8n
 
 ### Erro: "ModuleNotFoundError: No module named 'dotenv'"
 
@@ -146,7 +146,7 @@ pip install -r requirements.txt
 pip install -r requirements.txt
 
 # 2. Executar testes automatizados
-python src/test.py
+python tests/test.py
 
 # 3. Se os testes passarem, testar com n8n real
 # (Configure o .env primeiro)
@@ -157,7 +157,7 @@ python src/main.py
 
 Antes de fazer commit, certifique-se de que:
 
-- [ ] `python src/test.py` executa sem erros
+- [ ] `python tests/test.py` executa sem erros
 - [ ] Todos os testes passam (4/4)
 - [ ] Arquivo de teste é gerado em `output/`
 - [ ] Templates XML são carregados corretamente

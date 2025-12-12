@@ -211,7 +211,7 @@ Contribuições são bem-vindas! Por favor, abra uma issue ou pull request.
 2. Leia o guia de GitFlow em [GITFLOW.md](GITFLOW.md)
 3. Crie uma branch `feature/nome-da-feature` a partir de `develop`
 4. Siga a convenção de commits (feat:, fix:, docs:, etc.)
-5. Certifique-se de que os testes passam (`python src/test.py`)
+5. Certifique-se de que os testes passam (`python tests/test.py`)
 6. Faça merge de volta para `develop`
 
 ## 📌 Roadmap

@@ -171,7 +171,7 @@ git merge develop
 
 ```bash
 # Execute os testes
-python src/test.py
+python tests/test.py
 
 # Teste manualmente
 python src/main.py
@@ -324,7 +324,7 @@ git commit -m "fix: corrige bug na ordenação topológica de nós
 
 ```bash
 # Teste a correção extensivamente
-python src/test.py
+python tests/test.py
 python src/main.py  # teste manual
 ```
 
@@ -427,7 +427,7 @@ Antes de fazer merge ou criar PR, verifique:
 
 - [ ] Código segue os padrões do projeto
 - [ ] Sem erros de lint (`python -m flake8 src/` ou equivalente)
-- [ ] Testes passam (`python src/test.py`)
+- [ ] Testes passam (`python tests/test.py`)
 - [ ] Testes manuais realizados
 - [ ] Sem código comentado ou debug
 
@@ -535,7 +535,7 @@ git commit -m "feat: adiciona template para nó Code
 - Suporta código JavaScript customizado do n8n"
 
 # 5. Testar
-python src/test.py
+python tests/test.py
 python src/main.py  # testar com workflow que usa Code node
 
 # 6. Atualizar branch
@@ -575,7 +575,7 @@ git commit -m "fix: corrige IndexError na ordenação de nós
 - Adiciona teste para caso edge"
 
 # 5. Testar
-python src/test.py
+python tests/test.py
 # Criar teste específico para o bug
 
 # 6. Finalizar hotfix
