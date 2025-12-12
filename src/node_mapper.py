@@ -17,33 +17,117 @@ class NodeMapper:
             xml_loader: Instância do XMLLoader para carregar templates
         """
         self.xml_loader = xml_loader
+        self.expression_parser = None
+    
+    def set_expression_parser(self, parser):
+        """
+        Define o parser de expressões a ser usado.
+        
+        Args:
+            parser: Instância de ExpressionParser
+        """
+        self.expression_parser = parser
     
     def generate_method_name(self, node: Dict) -> str:
         """
-        Gera um nome de método baseado no nó.
+        Gera um nome de método baseado no nome descritivo do nó.
+        Converte para camelCase válido em PHP.
         
         Args:
             node: Dados do nó do workflow
             
         Returns:
-            Nome do método em formato camelCase
+            Nome do método em formato camelCase (ex: 'aiAgent', 'sendEmail', 'updateCrm')
         """
+        # Usa o nome descritivo do nó (não o tipo)
         node_name = node.get('name', 'node')
-        node_type = node.get('type', 'unknown')
         
-        # Remove caracteres especiais e normaliza
-        method_name = node_name.lower().replace(' ', '_').replace('-', '_')
-        method_name = ''.join(c for c in method_name if c.isalnum() or c == '_')
+        if not node_name or node_name.strip() == '':
+            # Fallback: tenta extrair nome do tipo se não houver nome descritivo
+            node_type = node.get('type', 'unknown')
+            # Extrai o último segmento do tipo como fallback
+            parts = node_type.split('.')
+            node_name = parts[-1] if parts else 'node'
+        
+        # Converte para camelCase
+        method_name = self._to_camel_case(node_name)
+        
+        # Garante que começa com letra minúscula (convenção PHP)
+        if method_name and method_name[0].isupper():
+            method_name = method_name[0].lower() + method_name[1:]
         
         # Garante que começa com letra
-        if method_name and not method_name[0].isalpha():
-            method_name = 'node_' + method_name
+        if not method_name or not method_name[0].isalpha():
+            method_name = 'node' + (method_name.capitalize() if method_name else '')
         
-        # Se estiver vazio, usa o tipo
-        if not method_name:
-            method_name = node_type.replace('.', '_')
+        # Evita palavras reservadas do PHP
+        php_reserved = {
+            'if', 'else', 'elseif', 'while', 'for', 'foreach', 'switch', 'case',
+            'default', 'break', 'continue', 'return', 'function', 'class', 'interface',
+            'trait', 'namespace', 'use', 'as', 'public', 'private', 'protected', 'static',
+            'abstract', 'final', 'const', 'var', 'new', 'clone', 'instanceof', 'try',
+            'catch', 'finally', 'throw', 'extends', 'implements', 'self', 'parent',
+            'true', 'false', 'null', 'array', 'string', 'int', 'float', 'bool',
+            'void', 'mixed', 'object', 'callable', 'iterable'
+        }
+        
+        if method_name.lower() in php_reserved:
+            method_name = method_name + 'Node'
         
         return method_name
+    
+    def _to_camel_case(self, text: str) -> str:
+        """
+        Converte um texto para camelCase válido em PHP.
+        Remove acentos e caracteres especiais.
+        
+        Exemplos:
+        - "AI Agent" -> "aiAgent"
+        - "Send Email" -> "sendEmail"
+        - "Update CRM" -> "updateCrm"
+        - "webhook-start" -> "webhookStart"
+        - "Conselheiro Bíblico" -> "conselheiroBiblico"
+        
+        Args:
+            text: Texto a ser convertido
+            
+        Returns:
+            Texto em camelCase válido em PHP
+        """
+        if not text:
+            return 'node'
+        
+        # Remove acentos e caracteres especiais
+        import unicodedata
+        import re
+        
+        # Normaliza para NFD (decompõe caracteres acentuados)
+        text = unicodedata.normalize('NFD', text)
+        # Remove diacríticos (acentos)
+        text = text.encode('ascii', 'ignore').decode('ascii')
+        
+        # Substitui caracteres especiais por espaços
+        text = re.sub(r'[^\w\s]', ' ', text)
+        # Divide por espaços, hífens, underscores
+        words = re.split(r'[\s\-_]+', text)
+        
+        # Remove palavras vazias
+        words = [w for w in words if w]
+        
+        if not words:
+            return 'node'
+        
+        # Primeira palavra em minúscula, demais com primeira letra maiúscula
+        result = words[0].lower()
+        for word in words[1:]:
+            if word:
+                # Capitaliza apenas a primeira letra, mantém resto como está
+                result += word[0].upper() + word[1:].lower()
+        
+        # Remove caracteres não alfanuméricos (mantém apenas letras ASCII e números)
+        result = ''.join(c for c in result if c.isalnum() and ord(c) < 128)
+        
+        return result if result else 'node'
     
     def map_node_to_method(self, node: Dict) -> Optional[str]:
         """

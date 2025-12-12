@@ -23,14 +23,32 @@
             
             // Obtém configurações da API (pode ser OpenAI, Anthropic, OpenRouter, etc.)
             $apiProvider = {{api_provider}};
-            $apiKey = {{api_key}};
-            $apiUrl = {{api_url}};
+            
+            // Usa classe de credenciais apropriada
+            $credentials = null;
+            if (strpos($apiProvider, 'anthropic') !== false || strpos($apiProvider, 'claude') !== false) {
+                $credentials = new AnthropicCredentials();
+                $apiUrl = 'https://api.anthropic.com/v1/messages';
+            } elseif (strpos($apiProvider, 'openrouter') !== false) {
+                $credentials = new OpenRouterCredentials();
+                $apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
+            } else {
+                $credentials = new OpenAICredentials();
+                $apiUrl = 'https://api.openai.com/v1/chat/completions';
+            }
+            
+            $apiKey = $credentials->getApiKey();
             
             // Prepara headers
             $headers = [
                 'Content-Type: application/json',
                 'Authorization: Bearer ' . $apiKey
             ];
+            
+            // Headers específicos para Anthropic
+            if ($credentials instanceof AnthropicCredentials) {
+                $headers[] = 'anthropic-version: 2023-06-01';
+            }
             
             // Prepara mensagens
             $messages = [];

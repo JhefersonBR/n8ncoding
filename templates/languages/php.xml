@@ -3,6 +3,10 @@
         <![CDATA[
 <?php
 
+require_once __DIR__ . '/{{credentials_path}}';
+
+{{credentials_use}}
+
 /**
  * Classe gerada automaticamente pelo n8ncoding
  * 
@@ -20,6 +24,15 @@ class {{class_name}} {
      * @var array
      */
     private array $context = [];
+    
+    /**
+     * Parâmetros do workflow (passados no construtor)
+     * 
+     * @var array
+     */
+    private array $params = [];
+
+    {{constructor}}
 
     /**
      * Executa o workflow
@@ -27,18 +40,18 @@ class {{class_name}} {
      * Este método executa todos os nós do workflow na ordem correta,
      * passando dados através do contexto interno.
      * 
-     * @param array $params Parâmetros iniciais para o workflow
+     * @param array $additionalParams Parâmetros adicionais (opcional)
      * @return mixed Resultado final do workflow (geralmente o contexto completo)
      * @throws \Exception Em caso de erro durante a execução
      */
-    public function run(array $params = []): mixed
+    public function run(array $additionalParams = []): mixed
     {
         try {
             // Inicializa o contexto com os parâmetros fornecidos
             $this->context = array_merge([
                 'start_time' => microtime(true),
                 'workflow_name' => '{{workflow_name}}',
-            ], $params);
+            ], $this->params, $additionalParams);
 
             // Executa os nós na ordem definida
             {{steps_calls}}
