@@ -6,42 +6,42 @@ ref: ai-agent
 permalink: /pt/examples/ai-agent/
 ---
 
-# Exemplo: Nó AI Agent
+# Example: AI Agent Node
 
-Este documento mostra como o nó **AI Agent** do n8n é convertido para código PHP.
+This document shows how the n8n **AI Agent** node is converted to PHP code.
 
-## 📋 Estrutura do Nó AI Agent
+## 📋 AI Agent Node Structure
 
-O nó AI Agent no n8n permite executar ações usando modelos de IA (como GPT-4, Claude, etc.). Ele geralmente contém:
+The AI Agent node in n8n allows executing actions using AI models (like GPT-4, Claude, etc.). It generally contains:
 
-- **Prompt**: Instrução para o agente
-- **Model**: Modelo de IA a ser usado (ex: gpt-4, gpt-3.5-turbo)
-- **Temperature**: Criatividade da resposta (0.0 a 1.0)
-- **Max Tokens**: Número máximo de tokens na resposta
-- **Tools**: Ferramentas que o agente pode usar
+- **Prompt**: Instruction for the agent
+- **Model**: AI model to be used (e.g., gpt-4, gpt-3.5-turbo)
+- **Temperature**: Response creativity (0.0 to 1.0)
+- **Max Tokens**: Maximum number of tokens in response
+- **Tools**: Tools the agent can use
 
-## 🔄 Conversão para PHP
+## 🔄 Conversion to PHP
 
-Quando um workflow contém um nó AI Agent, ele é convertido para um método PHP que:
+When a workflow contains an AI Agent node, it is converted to a PHP method that:
 
-1. Configura a requisição para a API de IA (OpenAI por padrão)
-2. Envia o prompt com os parâmetros configurados
-3. Processa a resposta e armazena no contexto
+1. Configures the request to the AI API (OpenAI by default)
+2. Sends the prompt with configured parameters
+3. Processes the response and stores it in context
 
-## 📝 Exemplo de Código Gerado
+## 📝 Generated Code Example
 
-### Workflow no n8n
+### Workflow in n8n
 
 ```
 Start → AI Agent → End
 ```
 
-### Código PHP Gerado
+### Generated PHP Code
 
 ```php
 <?php
 
-class WorkflowComAIAgent {
+class WorkflowWithAIAgent {
 
     private array $context = [];
 
@@ -57,19 +57,19 @@ class WorkflowComAIAgent {
 
     private function start(): void
     {
-        // Nó: Start
+        // Node: Start
         $this->context['start_output'] = [];
     }
 
     private function ai_agent(): void
     {
-        // AI Agent - Execução de agente de IA
-        $prompt = "Analise este texto e extraia as informações principais";
+        // AI Agent - AI agent execution
+        $prompt = "Analyze this text and extract main information";
         $model = "gpt-4";
         $temperature = 0.7;
         $maxTokens = 2000;
         
-        // Configuração da API de IA (exemplo usando OpenAI)
+        // AI API configuration (example using OpenAI)
         $apiKey = getenv('OPENAI_API_KEY') ?: '';
         $apiUrl = 'https://api.openai.com/v1/chat/completions';
         
@@ -94,7 +94,7 @@ class WorkflowComAIAgent {
             'max_tokens' => $maxTokens
         ];
         
-        // Executa requisição para API de IA
+        // Execute request to AI API
         $ch = curl_init($apiUrl);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
@@ -116,7 +116,7 @@ class WorkflowComAIAgent {
             ];
         } else {
             $this->context['ai_agent_output'] = [
-                'error' => 'Erro na requisição à API de IA',
+                'error' => 'Error in AI API request',
                 'http_code' => $httpCode,
                 'response' => $response
             ];
@@ -125,49 +125,48 @@ class WorkflowComAIAgent {
 }
 ```
 
-## 🔧 Configuração
+## 🔧 Configuration
 
-### Variáveis de Ambiente
+### Environment Variables
 
-Para usar o código gerado, você precisa configurar a chave da API:
+To use the generated code, you need to configure the API key:
 
 ```env
-OPENAI_API_KEY=sua-chave-aqui
+OPENAI_API_KEY=your-key-here
 ```
 
-### Uso do Código Gerado
+### Usage of Generated Code
 
 ```php
-$workflow = new WorkflowComAIAgent();
+$workflow = new WorkflowWithAIAgent();
 $result = $workflow->run([
-    'input_data' => 'Texto para análise'
+    'input_data' => 'Text for analysis'
 ]);
 
-// Acessar resposta da IA
+// Access AI response
 $aiResponse = $result['ai_agent_output']['response'];
 echo $aiResponse;
 ```
 
-## 🎯 Parâmetros Suportados
+## 🎯 Supported Parameters
 
-O template do AI Agent suporta os seguintes parâmetros do n8n:
+The AI Agent template supports the following n8n parameters:
 
-- ✅ **prompt**: Texto da instrução para o agente
-- ✅ **model**: Modelo de IA (gpt-4, gpt-3.5-turbo, etc.)
-- ✅ **temperature**: Nível de criatividade (0.0 a 1.0)
-- ✅ **maxTokens**: Número máximo de tokens
-- ✅ **tools**: Lista de ferramentas disponíveis (comentadas no código)
+- ✅ **prompt**: Instruction text for the agent
+- ✅ **model**: AI model (gpt-4, gpt-3.5-turbo, etc.)
+- ✅ **temperature**: Creativity level (0.0 to 1.0)
+- ✅ **maxTokens**: Maximum number of tokens
+- ✅ **tools**: List of available tools (commented in code)
 
-## 🔄 Personalização
+## 🔄 Customization
 
-Se você precisar usar uma API diferente (como Anthropic Claude, Google Gemini, etc.), você pode:
+If you need to use a different API (like Anthropic Claude, Google Gemini, etc.), you can:
 
-1. Editar o template `templates/nodes/aiAgent.xml`
-2. Modificar a URL da API e estrutura do body
-3. Ajustar o processamento da resposta
+1. Edit the template `templates/nodes/aiAgent.xml`
+2. Modify the API URL and body structure
+3. Adjust response processing
 
-## 📚 Referências
+## 📚 References
 
 - [OpenAI API Documentation](https://platform.openai.com/docs/api-reference)
 - [n8n AI Agent Node](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.aiagent/)
-

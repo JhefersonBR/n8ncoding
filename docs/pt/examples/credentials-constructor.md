@@ -6,17 +6,17 @@ ref: credentials-constructor
 permalink: /pt/examples/credentials-constructor/
 ---
 
-# Exemplo: Construtor com Parâmetros e Classes de Credenciais
+# Example: Constructor with Parameters and Credential Classes
 
-Este documento explica as novas funcionalidades implementadas.
+This document explains the new features implemented.
 
-## 🎯 Funcionalidades Implementadas
+## 🎯 Implemented Features
 
-### 1. Construtor com Parâmetros do Primeiro Nó
+### 1. Constructor with First Node Parameters
 
-O sistema agora extrai automaticamente os parâmetros do primeiro nó do workflow (geralmente um webhook ou start) e os transforma em parâmetros do construtor da classe.
+The system now automatically extracts parameters from the first node of the workflow (usually a webhook or start) and transforms them into class constructor parameters.
 
-**Antes:**
+**Before:**
 ```php
 class Workflow {
     public function run(array $params = []) {
@@ -25,12 +25,12 @@ class Workflow {
     }
 }
 
-// Uso
+// Usage
 $workflow = new Workflow();
-$workflow->run(['msg' => 'teste']);
+$workflow->run(['msg' => 'test']);
 ```
 
-**Depois:**
+**After:**
 ```php
 class Workflow {
     public function __construct(mixed $msg = null, mixed $id = null, array $params = []) {
@@ -46,81 +46,81 @@ class Workflow {
     }
 }
 
-// Uso - muito mais claro e type-safe
-$workflow = new Workflow(msg: 'teste', id: '123');
+// Usage - much clearer and type-safe
+$workflow = new Workflow(msg: 'test', id: '123');
 $workflow->run();
 ```
 
-### 2. Parser de Expressões n8n
+### 2. n8n Expression Parser
 
-O sistema agora identifica e substitui expressões do n8n como `={{ $json.body.msg }}` por código PHP que acessa os parâmetros do construtor.
+The system now identifies and replaces n8n expressions like `={{ $json.body.msg }}` with PHP code that accesses constructor parameters.
 
-**Expressões Suportadas:**
+**Supported Expressions:**
 - `={{ $json.body.msg }}` → `$this->params['msg']`
 - `={{ $json.query.id }}` → `$this->params['id']`
 - `={{ $json.headers.authorization }}` → `$this->params['authorization']`
 - `={{ $json.body.data.name }}` → `$this->params['data']['name']`
 
-**Exemplo no Código Gerado:**
+**Example in Generated Code:**
 ```php
 private function ai_agent(): void
 {
-    // Antes: $prompt = "={{ $json.body.msg }}";
-    // Depois:
+    // Before: $prompt = "={{ $json.body.msg }}";
+    // After:
     $prompt = $this->params['msg'] ?? null;
     // ...
 }
 ```
 
-### 3. Classes de Credenciais
+### 3. Credential Classes
 
-Em vez de usar `getenv()` diretamente no código, agora são geradas classes de credenciais reutilizáveis.
+Instead of using `getenv()` directly in code, reusable credential classes are now generated.
 
-**Estrutura Criada:**
+**Created Structure:**
 ```
 templates/credentials/
 └── Credentials.php
-    ├── Credentials (classe base)
+    ├── Credentials (base class)
     ├── OpenAICredentials
     ├── AnthropicCredentials
     └── OpenRouterCredentials
 ```
 
-**Uso no Código Gerado:**
+**Usage in Generated Code:**
 ```php
-// Antes:
+// Before:
 $apiKey = getenv('OPENAI_API_KEY') ?: '';
 
-// Depois:
+// After:
 use OpenAICredentials;
 
 $credentials = new OpenAICredentials();
 $apiKey = $credentials->getApiKey();
 ```
 
-**Vantagens:**
-- ✅ Validação automática de credenciais
-- ✅ Mensagens de erro claras
-- ✅ Possibilidade de injetar credenciais via construtor
-- ✅ Fallback para variáveis de ambiente
-- ✅ Código mais testável e reutilizável
+**Advantages:**
+- ✅ Automatic credential validation
+- ✅ Clear error messages
+- ✅ Possibility to inject credentials via constructor
+- ✅ Fallback to environment variables
+- ✅ More testable and reusable code
 
-## 📝 Exemplo Completo
+## 📝 Complete Example
 
-### Workflow no n8n
+### Workflow in n8n
 
 ```
 Webhook → AI Agent → End
 ```
 
-**Webhook recebe:**
-- Body: `{ "msg": "Olá" }`
+**Webhook receives:**
+- Body: `{ "msg": "Hello" }`
 - Query: `{ "id": "123" }`
 
-**AI Agent usa:**
+**AI Agent uses:**
 - Prompt: `={{ $json.body.msg }}`
 
-### Código PHP Gerado
+### Generated PHP Code
 
 ```php
 <?php
@@ -129,26 +129,26 @@ require_once __DIR__ . '/../credentials/Credentials.php';
 
 use OpenAICredentials;
 
-class MeuWorkflow {
+class MyWorkflow {
 
     private array $context = [];
     private array $params = [];
 
     /**
-     * Construtor da classe
+     * Class constructor
      *
-     * @param mixed $msg Parâmetro msg
-     * @param mixed $id Parâmetro id
-     * @param array $params Parâmetros adicionais (opcional)
+     * @param mixed $msg Parameter msg
+     * @param mixed $id Parameter id
+     * @param array $params Additional parameters (optional)
      */
     public function __construct(mixed $msg = null, mixed $id = null, array $params = [])
     {
-        // Parâmetros nomeados
+        // Named parameters
         $this->params = [];
         $this->params['msg'] = $msg;
         $this->params['id'] = $id;
 
-        // Parâmetros adicionais
+        // Additional parameters
         $this->params = array_merge($this->params, $params);
     }
 
@@ -157,7 +157,7 @@ class MeuWorkflow {
         try {
             $this->context = array_merge([
                 'start_time' => microtime(true),
-                'workflow_name' => 'MeuWorkflow',
+                'workflow_name' => 'MyWorkflow',
             ], $this->params, $additionalParams);
 
             $this->webhook();
@@ -171,40 +171,40 @@ class MeuWorkflow {
 
     private function ai_agent(): void
     {
-        // Expressão substituída automaticamente!
+        // Expression automatically replaced!
         $prompt = $this->params['msg'] ?? null;
         
         $credentials = new OpenAICredentials();
         $apiKey = $credentials->getApiKey();
         
-        // ... resto do código
+        // ... rest of code
     }
 }
 ```
 
-### Uso do Código Gerado
+### Usage of Generated Code
 
 ```php
-// Opção 1: Parâmetros nomeados (PHP 8+)
-$workflow = new MeuWorkflow(msg: 'Olá mundo', id: '123');
+// Option 1: Named parameters (PHP 8+)
+$workflow = new MyWorkflow(msg: 'Hello world', id: '123');
 $result = $workflow->run();
 
-// Opção 2: Parâmetros posicionais
-$workflow = new MeuWorkflow('Olá mundo', '123');
+// Option 2: Positional parameters
+$workflow = new MyWorkflow('Hello world', '123');
 $result = $workflow->run();
 
-// Opção 3: Array de parâmetros
-$workflow = new MeuWorkflow(null, null, ['msg' => 'Olá', 'id' => '123']);
+// Option 3: Array of parameters
+$workflow = new MyWorkflow(null, null, ['msg' => 'Hello', 'id' => '123']);
 $result = $workflow->run();
 
-// Opção 4: Parâmetros adicionais no run()
-$workflow = new MeuWorkflow('Olá');
+// Option 4: Additional parameters in run()
+$workflow = new MyWorkflow('Hello');
 $result = $workflow->run(['id' => '123']);
 ```
 
-## 🔧 Configuração de Credenciais
+## 🔧 Credential Configuration
 
-### Opção 1: Variáveis de Ambiente (Recomendado)
+### Option 1: Environment Variables (Recommended)
 
 ```env
 OPENAI_API_KEY=sk-...
@@ -212,34 +212,18 @@ ANTHROPIC_API_KEY=sk-ant-...
 OPENROUTER_API_KEY=sk-or-...
 ```
 
-### Opção 2: Injeção via Construtor
+### Option 2: Injection via Constructor
 
 ```php
-// Para testes ou ambientes específicos
+// For tests or specific environments
 $credentials = new OpenAICredentials('sk-custom-key');
-$workflow = new MeuWorkflow(msg: 'teste');
+$workflow = new MyWorkflow(msg: 'test');
 ```
 
-## 🎨 Benefícios
+## 🎨 Benefits
 
-1. **Type Safety**: Parâmetros tipados no construtor
-2. **Clareza**: Fica óbvio quais parâmetros o workflow precisa
-3. **Reutilização**: Classes de credenciais podem ser usadas em outros lugares
-4. **Testabilidade**: Fácil mockar credenciais em testes
-5. **Manutenibilidade**: Código mais organizado e profissional
-
-## 📚 Arquivos Criados
-
-- `src/parameter_extractor.py` - Extrai parâmetros do primeiro nó
-- `src/expression_parser.py` - Faz parsing de expressões n8n
-- `templates/credentials/Credentials.php` - Classes de credenciais
-- `tests/test_expression_parser.py` - Testes do parser
-- `tests/test_complete_feature.py` - Testes completos
-
-## 🚀 Próximos Passos
-
-- [ ] Suporte para mais tipos de expressões n8n
-- [ ] Validação de tipos de parâmetros
-- [ ] Geração de interfaces para parâmetros
-- [ ] Suporte para credenciais customizadas
-
+1. **Type Safety**: Typed parameters in constructor
+2. **Clarity**: It's obvious which parameters the workflow needs
+3. **Reusability**: Credential classes can be used elsewhere
+4. **Testability**: Easy to mock credentials in tests
+5. **Maintainability**: More organized and professional code

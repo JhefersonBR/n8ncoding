@@ -6,40 +6,39 @@ ref: usage
 permalink: /pt/usage/
 ---
 
-# Exemplo de Uso do n8ncoding
+# Usage Guide
 
-Este guia mostra como usar o **n8ncoding** para converter workflows do n8n em classes de código em múltiplas linguagens.
+This guide shows how to use **n8ncoding** to convert n8n workflows into code classes in multiple languages.
 
-## 📋 Índice
+## 📋 Table of Contents
 
-1. [Configuração Inicial](#configuração-inicial)
-2. [Executando o Programa](#executando-o-programa)
-3. [Fluxo de Execução Completo](#fluxo-de-execução-completo)
-4. [Seleção de Linguagens](#seleção-de-linguagens)
-5. [Estrutura de Saída](#estrutura-de-saída)
-6. [Exemplos de Código Gerado](#exemplos-de-código-gerado)
-7. [Classes de Credenciais](#classes-de-credenciais)
-8. [Parâmetros no Construtor](#parâmetros-no-construtor)
+1. [Initial Configuration](#initial-configuration)
+2. [Running the Program](#running-the-program)
+3. [Complete Execution Flow](#complete-execution-flow)
+4. [Language Selection](#language-selection)
+5. [Output Structure](#output-structure)
+6. [Generated Code Examples](#generated-code-examples)
+7. [Credential Classes](#credential-classes)
+8. [Constructor Parameters](#constructor-parameters)
 9. [Troubleshooting](#troubleshooting)
 
----
 
-## ⚙️ Configuração Inicial
+## ⚙️ Initial Configuration
 
-### 1. Variáveis de Ambiente (Recomendado)
+### 1. Environment Variables (Recommended)
 
-O projeto utiliza variáveis de ambiente para configurações sensíveis. Crie um arquivo `.env` na raiz do projeto:
+The project uses environment variables for sensitive configurations. Create a `.env` file in the project root:
 
 ```env
 N8N_URL=http://localhost:5678
-N8N_API_KEY=sua-api-key-aqui
+N8N_API_KEY=your-api-key-here
 ```
 
-**Importante:** O arquivo `.env` não deve ser commitado no Git (já está no `.gitignore`).
+**Important:** The `.env` file should not be committed to Git (already in `.gitignore`).
 
-### 2. Arquivo de Configuração
+### 2. Configuration File
 
-O arquivo `config/settings.json` já está configurado para usar variáveis de ambiente:
+The `config/settings.json` file is already configured to use environment variables:
 
 ```json
 {
@@ -54,155 +53,151 @@ O arquivo `config/settings.json` já está configurado para usar variáveis de a
 }
 ```
 
-**Nota:** A linguagem padrão em `settings.json` é apenas uma sugestão. Você poderá escolher múltiplas linguagens durante a execução.
+**Note:** The default language in `settings.json` is just a suggestion. You can choose multiple languages during execution.
 
----
 
-## 🚀 Executando o Programa
+## 🚀 Running the Program
 
 ```bash
 python src/main.py
 ```
 
-O programa irá:
-1. ✅ Carregar configurações do `.env` e `config/settings.json`
-2. ✅ Conectar à API do n8n
-3. ✅ Listar todos os workflows disponíveis
-4. ✅ Permitir seleção de workflows
-5. ✅ Permitir seleção de linguagens (múltipla escolha)
-6. ✅ Gerar classes para cada workflow em cada linguagem selecionada
+The program will:
+1. ✅ Load settings from `.env` and `config/settings.json`
+2. ✅ Connect to the n8n API
+3. ✅ List all available workflows
+4. ✅ Allow workflow selection
+5. ✅ Allow language selection (multiple choice)
+6. ✅ Generate classes for each workflow in each selected language
 
----
 
-## 🔄 Fluxo de Execução Completo
+## 🔄 Complete Execution Flow
 
-### Passo 1: Conexão com n8n
-
-```
-============================================================
-n8ncoding - Conversor de Workflows n8n para Código
-============================================================
-
-Conectando ao n8n em: http://localhost:5678
-✓ Conexão estabelecida com sucesso!
-```
-
-### Passo 2: Listagem de Workflows
-
-```
-Buscando workflows...
-✓ 5 workflow(s) encontrado(s).
-
-Escolha os workflows que deseja converter:
-============================================================
-[1] Enviar Email Automático (ID: abc123)
-[2] Atualizar CRM (ID: def456)
-[3] Extrair Dados do Google Sheets (ID: ghi789)
-[4] Processar Webhook (ID: jkl012)
-[5] Conselheiro Bíblico (ID: mno345)
-============================================================
-
-Digite os números separados por vírgula (Ex: 1,3,4): 1,3,5
-```
-
-### Passo 3: Seleção de Linguagens
+### Step 1: Connection with n8n
 
 ```
 ============================================================
-Escolha as linguagens de destino:
+n8ncoding - n8n Workflow to Code Converter
+============================================================
+
+Connecting to n8n at: http://localhost:5678
+✓ Connection established successfully!
+```
+
+### Step 2: Workflow Listing
+
+```
+Searching workflows...
+✓ 5 workflow(s) found.
+
+Choose the workflows you want to convert:
+============================================================
+[1] Send Automatic Email (ID: abc123)
+[2] Update CRM (ID: def456)
+[3] Extract Data from Google Sheets (ID: ghi789)
+[4] Process Webhook (ID: jkl012)
+[5] Biblical Counselor (ID: mno345)
+============================================================
+
+Enter numbers separated by commas (Ex: 1,3,4): 1,3,5
+```
+
+### Step 3: Language Selection
+
+```
+============================================================
+Choose target languages:
 ============================================================
 [1] PHP - PHP 8.0+
 [2] Python - Python 3.8+
 [3] JavaScript - Node.js 14+
 ============================================================
 
-Linguagem padrão configurada: PHP
-Pressione Enter para usar apenas a padrão ou escolha múltiplas opções.
+Default language configured: PHP
+Press Enter to use only the default or choose multiple options.
 
-Digite os números separados por vírgula (Ex: 1,3) ou Enter para padrão: 1,2
+Enter numbers separated by commas (Ex: 1,3) or Enter for default: 1,2
 ```
 
-**Resultado:**
+**Result:**
 ```
-✓ 2 linguagem(s) selecionada(s): PHP, Python
+✓ 2 language(s) selected: PHP, Python
 ```
 
-### Passo 4: Geração de Código
+### Step 4: Code Generation
 
 ```
 ============================================================
-Gerando código...
+Generating code...
 ============================================================
 
 ============================================================
-Processando: Enviar Email Automático
+Processing: Send Automatic Email
 ============================================================
 
-  → Gerando código em PHP...
-  ✓ Enviar Email Automático convertido para PHP com sucesso!
+  → Generating PHP code...
+  ✓ Send Automatic Email converted to PHP successfully!
 
-  → Gerando código em Python...
-  ✓ Enviar Email Automático convertido para Python com sucesso!
+  → Generating Python code...
+  ✓ Send Automatic Email converted to Python successfully!
 
 ============================================================
-Processando: Extrair Dados do Google Sheets
+Processing: Extract Data from Google Sheets
 ============================================================
 ...
 ```
 
----
 
-## 🌐 Seleção de Linguagens
+## 🌐 Language Selection
 
-O n8ncoding suporta **múltiplas linguagens** simultaneamente:
+n8ncoding supports **multiple languages** simultaneously:
 
-### Linguagens Disponíveis
+### Available Languages
 
-| Linguagem | Versão Mínima | Descrição |
-|-----------|---------------|-----------|
-| **PHP** | 8.0+ | Classes PHP com type hints e PHPDoc |
-| **Python** | 3.8+ | Classes Python com type hints e docstrings |
-| **JavaScript** | Node.js 14+ | Classes ES6+ com JSDoc |
+| Language | Minimum Version | Description |
+|----------|----------------|-------------|
+| **PHP** | 8.0+ | PHP classes with type hints and PHPDoc |
+| **Python** | 3.8+ | Python classes with type hints and docstrings |
+| **JavaScript** | Node.js 14+ | ES6+ classes with JSDoc |
 
-### Seleção Múltipla
+### Multiple Selection
 
-Você pode gerar código para múltiplas linguagens ao mesmo tempo:
+You can generate code for multiple languages at the same time:
 
 ```bash
-# Exemplo: Gerar PHP e JavaScript
-Digite os números separados por vírgula (Ex: 1,3): 1,3
+# Example: Generate PHP and JavaScript
+Enter numbers separated by commas (Ex: 1,3): 1,3
 
-✓ 2 linguagem(s) selecionada(s): PHP, JavaScript
+✓ 2 language(s) selected: PHP, JavaScript
 ```
 
-**Resultado:** O mesmo workflow será gerado em ambas as linguagens.
+**Result:** The same workflow will be generated in both languages.
 
----
 
-## 📁 Estrutura de Saída
+## 📁 Output Structure
 
-### Organização por Linguagem
+### Organization by Language
 
-Os arquivos gerados são organizados por linguagem:
+Generated files are organized by language:
 
 ```
 output/
-├── php/                          # Classes PHP
-│   ├── EnviarEmailAutomatico.php
-│   ├── ExtrairDadosGoogleSheets.php
-│   └── ConselheiroBiblico.php
+├── php/                          # PHP Classes
+│   ├── SendAutomaticEmail.php
+│   ├── ExtractDataGoogleSheets.php
+│   └── BiblicalCounselor.php
 │
-├── python/                        # Classes Python
-│   ├── EnviarEmailAutomatico.py
-│   ├── ExtrairDadosGoogleSheets.py
-│   └── ConselheiroBiblico.py
+├── python/                        # Python Classes
+│   ├── SendAutomaticEmail.py
+│   ├── ExtractDataGoogleSheets.py
+│   └── BiblicalCounselor.py
 │
-├── javascript/                    # Classes JavaScript
-│   ├── EnviarEmailAutomatico.js
-│   ├── ExtrairDadosGoogleSheets.js
-│   └── ConselheiroBiblico.js
+├── javascript/                    # JavaScript Classes
+│   ├── SendAutomaticEmail.js
+│   ├── ExtractDataGoogleSheets.js
+│   └── BiblicalCounselor.js
 │
-└── credentials/                   # Classes de Credenciais (compartilhadas)
+└── credentials/                   # Credential Classes (shared)
     ├── Credentials.php
     ├── Credentials.py
     ├── Credentials.js
@@ -217,294 +212,23 @@ output/
     └── OpenRouterCredentials.js
 ```
 
-**Nota:** As classes de credenciais são geradas automaticamente quando necessário (ex: ao usar nós AI Agent).
+**Note:** Credential classes are automatically generated when needed (e.g., when using AI Agent nodes).
 
----
 
-## 💻 Exemplos de Código Gerado
+## 💻 Generated Code Examples
 
-### PHP
+See the [AI Agent Example]({{ site.baseurl }}/en/examples/ai-agent/) and [Credentials Constructor Example]({{ site.baseurl }}/en/examples/credentials-constructor/) for detailed code examples.
 
-```php
-<?php
 
-require_once __DIR__ . '/../credentials/Credentials.php';
+## 🔐 Credential Classes
 
-use OpenAICredentials;
+n8ncoding automatically generates credential classes when needed (e.g., when using AI Agent nodes).
 
-/**
- * Classe gerada automaticamente pelo n8ncoding
- *
- * Esta classe representa o workflow "Enviar Email Automático" convertido do n8n.
- *
- * @package Generated
- * @author n8ncoding
- * @version 1.0.0
- */
-class EnviarEmailAutomatico {
+### Structure
 
-    /**
-     * Contexto interno para armazenar dados entre nós
-     *
-     * @var array
-     */
-    private array $context = [];
+Credential classes are saved in `output/credentials/` and are shared among all workflows.
 
-    /**
-     * Parâmetros do workflow (passados no construtor)
-     *
-     * @var array
-     */
-    private array $params = [];
-
-    /**
-     * Construtor da classe
-     *
-     * @param string|null $mensagem Parâmetro mensagem
-     * @param string|null $destinatario Parâmetro destinatario
-     */
-    public function __construct(?string $mensagem = null, ?string $destinatario = null)
-    {
-        $this->context = [];
-        $this->params = [];
-        
-        $this->params['mensagem'] = $mensagem;
-        $this->params['destinatario'] = $destinatario;
-    }
-
-    /**
-     * Executa o workflow
-     *
-     * @param array $params Parâmetros adicionais (opcional)
-     * @return mixed Resultado final do workflow
-     */
-    public function run(array $params = []): mixed
-    {
-        // Mescla parâmetros adicionais com os do construtor
-        $this->context = array_merge($this->params, $params);
-
-        $this->startNode();
-        $this->httpRequestNode();
-        $this->sendEmailNode();
-
-        return $this->context;
-    }
-
-    private function startNode(): void
-    {
-        // Usa parâmetros do construtor
-        $mensagem = $this->params['mensagem'] ?? null;
-        $this->context['start_output'] = ['mensagem' => $mensagem];
-    }
-
-    private function httpRequestNode(): void
-    {
-        $url = "https://api.example.com/send";
-        $method = "POST";
-        $headers = ['Content-Type: application/json'];
-        $body = [
-            'message' => $this->context['start_output']['mensagem']
-        ];
-        
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
-        
-        $response = curl_exec($ch);
-        $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-        
-        $this->context['http_request_output'] = json_decode($response, true);
-    }
-
-    private function sendEmailNode(): void
-    {
-        // Implementação do envio de email
-        $this->context['email_sent'] = true;
-    }
-}
-```
-
-### Python
-
-```python
-"""
-Classe gerada automaticamente pelo n8ncoding
-
-Esta classe representa o workflow "Enviar Email Automático" convertido do n8n.
-
-@author n8ncoding
-@version 1.0.0
-"""
-import os
-import sys
-from typing import Dict, Any, Optional
-from pathlib import Path
-
-# Adiciona o diretório de credenciais ao path
-credentials_path = Path(__file__).parent.parent.parent / 'credentials'
-sys.path.insert(0, str(credentials_path))
-
-from OpenAICredentials import OpenAICredentials
-
-class EnviarEmailAutomatico:
-    """
-    Classe gerada automaticamente pelo n8ncoding
-
-    Esta classe representa o workflow "Enviar Email Automático" convertido do n8n.
-    """
-
-    def __init__(self, mensagem: str = None, destinatario: str = None):
-        """
-        Inicializa a classe do workflow.
-
-        mensagem: str - Parâmetro mensagem
-        destinatario: str - Parâmetro destinatario
-        """
-        self.context: Dict[str, Any] = {}
-        self.params: Dict[str, Any] = {}
-
-        self.params['mensagem'] = mensagem
-        self.params['destinatario'] = destinatario
-
-    def run(self, additional_params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-        """
-        Executa o workflow.
-
-        Args:
-            additional_params: Parâmetros adicionais (opcional)
-
-        Returns:
-            Resultado final do workflow (geralmente o contexto completo)
-        """
-        if additional_params:
-            self.context.update(additional_params)
-        self.context.update(self.params)
-
-        self.startNode()
-        self.httpRequestNode()
-        self.sendEmailNode()
-
-        return self.context
-
-    def startNode(self) -> None:
-        """Nó: Start"""
-        mensagem = self.params.get('mensagem')
-        self.context['start_output'] = {'mensagem': mensagem}
-
-    def httpRequestNode(self) -> None:
-        """Nó: HTTP Request"""
-        import requests
-        
-        url = "https://api.example.com/send"
-        method = "POST"
-        headers = {'Content-Type': 'application/json'}
-        body = {
-            'message': self.context['start_output']['mensagem']
-        }
-        
-        response = requests.request(method, url, headers=headers, json=body)
-        self.context['http_request_output'] = response.json()
-
-    def sendEmailNode(self) -> None:
-        """Nó: Send Email"""
-        self.context['email_sent'] = True
-```
-
-### JavaScript
-
-```javascript
-/**
- * Classe gerada automaticamente pelo n8ncoding
- *
- * Esta classe representa o workflow "Enviar Email Automático" convertido do n8n.
- *
- * @author n8ncoding
- * @version 1.0.0
- */
-
-const { OpenAICredentials } = require('../credentials/OpenAICredentials.js');
-
-class EnviarEmailAutomatico {
-    /**
-     * Construtor da classe
-     *
-     * @param {string} mensagem - Parâmetro mensagem
-     * @param {string} destinatario - Parâmetro destinatario
-     */
-    constructor(mensagem = null, destinatario = null) {
-        /**
-         * Contexto interno para armazenar dados entre nós
-         * @type {Object}
-         */
-        this.context = {};
-
-        /**
-         * Parâmetros do workflow (passados no construtor)
-         * @type {Object}
-         */
-        this.params = {};
-
-        this.params['mensagem'] = mensagem;
-        this.params['destinatario'] = destinatario;
-    }
-
-    /**
-     * Executa o workflow
-     *
-     * @param {Object} additionalParams - Parâmetros adicionais (opcional)
-     * @returns {Promise<Object>} Resultado final do workflow
-     */
-    async run(additionalParams = {}) {
-        this.context = { ...this.params, ...additionalParams };
-
-        await this.startNode();
-        await this.httpRequestNode();
-        await this.sendEmailNode();
-
-        return this.context;
-    }
-
-    async startNode() {
-        const mensagem = this.params['mensagem'] || null;
-        this.context['start_output'] = { mensagem };
-    }
-
-    async httpRequestNode() {
-        const axios = require('axios');
-        
-        const url = "https://api.example.com/send";
-        const method = "POST";
-        const headers = { 'Content-Type': 'application/json' };
-        const body = {
-            message: this.context['start_output']['mensagem']
-        };
-        
-        const response = await axios({ method, url, headers, data: body });
-        this.context['http_request_output'] = response.data;
-    }
-
-    async sendEmailNode() {
-        this.context['email_sent'] = true;
-    }
-}
-
-module.exports = EnviarEmailAutomatico;
-```
-
----
-
-## 🔐 Classes de Credenciais
-
-O n8ncoding gera automaticamente classes de credenciais quando necessário (ex: ao usar nós AI Agent).
-
-### Estrutura
-
-As classes de credenciais são salvas em `output/credentials/` e são compartilhadas entre todos os workflows.
-
-### Exemplo: OpenAICredentials (PHP)
+### Example: OpenAICredentials (PHP)
 
 ```php
 <?php
@@ -513,41 +237,40 @@ class OpenAICredentials {
     public function getApiKey(): string {
         $apiKey = getenv('OPENAI_API_KEY');
         if (!$apiKey) {
-            throw new \Exception('OPENAI_API_KEY não configurada nas variáveis de ambiente');
+            throw new \Exception('OPENAI_API_KEY not configured in environment variables');
         }
         return $apiKey;
     }
 }
 ```
 
-### Uso nas Classes Geradas
+### Usage in Generated Classes
 
 ```php
 use OpenAICredentials;
 
-// Dentro de um método
+// Inside a method
 $credentials = new OpenAICredentials();
 $apiKey = $credentials->getApiKey();
 ```
 
----
 
-## 🎯 Parâmetros no Construtor
+## 🎯 Constructor Parameters
 
-O n8ncoding identifica automaticamente parâmetros do primeiro nó do workflow e os adiciona como parâmetros do construtor.
+n8ncoding automatically identifies parameters from the first node of the workflow and adds them as constructor parameters.
 
-### Como Funciona
+### How It Works
 
-1. **Identificação:** O sistema analisa expressões n8n no primeiro nó (ex: `={{ $json.body.msg }}`)
-2. **Extração:** Extrai os caminhos de dados (ex: `body.msg` → parâmetro `msg`)
-3. **Geração:** Adiciona como parâmetros do construtor
+1. **Identification:** The system analyzes n8n expressions in the first node (e.g., `={{ $json.body.msg }}`)
+2. **Extraction:** Extracts data paths (e.g., `body.msg` → parameter `msg`)
+3. **Generation:** Adds as constructor parameters
 
-### Exemplo
+### Example
 
-**Workflow n8n:**
-- Primeiro nó recebe: `={{ $json.body.msg }}` e `={{ $json.query.id }}`
+**n8n Workflow:**
+- First node receives: `={{ $json.body.msg }}` and `={{ $json.query.id }}`
 
-**Classe gerada:**
+**Generated Class:**
 ```php
 public function __construct(?string $msg = null, ?string $id = null)
 {
@@ -556,102 +279,98 @@ public function __construct(?string $msg = null, ?string $id = null)
 }
 ```
 
-**Uso:**
+**Usage:**
 ```php
-$workflow = new EnviarEmailAutomatico(
-    mensagem: "Olá!",
-    destinatario: "user@example.com"
+$workflow = new SendAutomaticEmail(
+    message: "Hello!",
+    recipient: "user@example.com"
 );
 
-$resultado = $workflow->run();
+$result = $workflow->run();
 ```
 
----
 
 ## 🔧 Troubleshooting
 
-### Erro de Conexão com n8n
+### Connection Error with n8n
 
-**Sintomas:**
+**Symptoms:**
 ```
-❌ Erro ao conectar ao n8n: Connection refused
-```
-
-**Soluções:**
-- Verifique se a URL do n8n está correta no `.env`
-- Confirme que a API Key está configurada corretamente
-- Verifique se o n8n está rodando e acessível
-- Teste a conexão manualmente: `curl http://localhost:5678/api/v1/workflows`
-
-### Nenhum Workflow Encontrado
-
-**Sintomas:**
-```
-✓ 0 workflow(s) encontrado(s).
+❌ Error connecting to n8n: Connection refused
 ```
 
-**Soluções:**
-- Verifique se há workflows criados no n8n
-- Confirme que a API Key tem permissão para listar workflows
-- Verifique se os workflows não estão em modo "ativo" (alguns n8n só listam workflows ativos)
+**Solutions:**
+- Check if the n8n URL is correct in `.env`
+- Confirm that the API Key is configured correctly
+- Verify that n8n is running and accessible
+- Test connection manually: `curl http://localhost:5678/api/v1/workflows`
 
-### Template Não Encontrado
+### No Workflows Found
 
-**Sintomas:**
+**Symptoms:**
 ```
-Template de nó não encontrado: templates/nodes/myCustomNode.xml
-```
-
-**Soluções:**
-- Se um tipo de nó não tem template específico, será usado um template padrão
-- Crie um template personalizado em `templates/nodes/` se necessário
-- Para múltiplas linguagens, crie em `templates/nodes/{language}/myCustomNode.xml`
-
-### Erro ao Gerar Código
-
-**Sintomas:**
-```
-❌ Erro ao gerar código Python para WorkflowX
+✓ 0 workflow(s) found.
 ```
 
-**Soluções:**
-- Verifique se os templates da linguagem existem em `templates/languages/`
-- Verifique se os templates de nós existem em `templates/nodes/{language}/`
-- Execute `python tests/test.py` para verificar se há problemas nos componentes
+**Solutions:**
+- Check if there are workflows created in n8n
+- Confirm that the API Key has permission to list workflows
+- Check if workflows are not in "active" mode (some n8n only list active workflows)
 
-### Erro de Import/Require
+### Template Not Found
 
-**Sintomas:**
+**Symptoms:**
+```
+Template node not found: templates/nodes/myCustomNode.xml
+```
+
+**Solutions:**
+- If a node type doesn't have a specific template, a default template will be used
+- Create a custom template in `templates/nodes/` if needed
+- For multiple languages, create in `templates/nodes/{language}/myCustomNode.xml`
+
+### Code Generation Error
+
+**Symptoms:**
+```
+❌ Error generating Python code for WorkflowX
+```
+
+**Solutions:**
+- Check if language templates exist in `templates/languages/`
+- Check if node templates exist in `templates/nodes/{language}/`
+- Run `python tests/test.py` to check for component issues
+
+### Import/Require Error
+
+**Symptoms:**
 ```
 Fatal error: Uncaught Error: Class 'OpenAICredentials' not found
 ```
 
-**Soluções:**
-- Verifique se as classes de credenciais foram geradas em `output/credentials/`
-- Verifique o caminho relativo no `require_once` ou `import`
-- Execute o gerador novamente para garantir que as credenciais foram criadas
+**Solutions:**
+- Check if credential classes were generated in `output/credentials/`
+- Check the relative path in `require_once` or `import`
+- Run the generator again to ensure credentials were created
 
----
 
-## 📚 Próximos Passos
+## 📚 Next Steps
 
-Após gerar as classes:
+After generating classes:
 
-1. **Revise o código gerado** em `output/{language}/`
-2. **Configure variáveis de ambiente** para credenciais (ex: `OPENAI_API_KEY`)
-3. **Teste a classe gerada** com dados reais
-4. **Customize conforme necessário** (os arquivos gerados são seus para modificar)
+1. **Review generated code** in `output/{language}/`
+2. **Configure environment variables** for credentials (e.g., `OPENAI_API_KEY`)
+3. **Test the generated class** with real data
+4. **Customize as needed** (generated files are yours to modify)
 
----
 
-## 💡 Dicas
+## 💡 Tips
 
-- ✅ Use **seleção múltipla de linguagens** para comparar implementações
-- ✅ **Revise sempre** o código gerado antes de usar em produção
-- ✅ **Configure variáveis de ambiente** para credenciais sensíveis
-- ✅ **Execute testes** (`python tests/test.py`) antes de fazer commit
-- ✅ **Documente workflows complexos** no n8n para facilitar a conversão
+- ✅ Use **multiple language selection** to compare implementations
+- ✅ **Always review** generated code before using in production
+- ✅ **Configure environment variables** for sensitive credentials
+- ✅ **Run tests** (`python tests/test.py`) before committing
+- ✅ **Document complex workflows** in n8n to facilitate conversion
 
----
 
-**Última atualização:** 2024
+**Last updated:** 2024

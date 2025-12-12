@@ -6,175 +6,152 @@ ref: testing
 permalink: /pt/testing/
 ---
 
-# Guia de Testes do n8ncoding
+# n8ncoding Testing Guide
 
-Este documento explica como executar testes da aplicação n8ncoding.
+This document explains how to run tests for the n8ncoding application.
 
-## 🧪 Tipos de Teste
+## 🧪 Test Types
 
-### 1. Teste Automatizado (Recomendado)
+### 1. Automated Test (Recommended)
 
-Execute o script de teste que valida todos os componentes:
+Run the test script that validates all components:
 
 ```bash
 python tests/test.py
 ```
 
-Este script executa:
-- ✅ Teste do XML Loader (carregamento de templates)
-- ✅ Teste do Node Mapper (mapeamento de nós)
-- ✅ Teste do Generator (geração de código)
-- ✅ Teste do Fluxo Completo (geração e salvamento)
+This script runs:
+- ✅ XML Loader test (template loading)
+- ✅ Node Mapper test (node mapping)
+- ✅ Generator test (code generation)
+- ✅ Complete Flow test (generation and saving)
 
-**Vantagens:**
-- Não precisa de servidor n8n rodando
-- Testa todos os componentes isoladamente
-- Mostra resultados detalhados
-- Gera um arquivo de teste na pasta `output/`
+**Advantages:**
+- No need for n8n server running
+- Tests all components in isolation
+- Shows detailed results
+- Generates a test file in the `output/` folder
 
-### 2. Teste com n8n Real
+### 2. Test with Real n8n
 
-Para testar com um servidor n8n real:
+To test with a real n8n server:
 
-1. **Configure o arquivo `.env`:**
+1. **Configure the `.env` file:**
    ```env
    N8N_URL=http://localhost:5678
-   N8N_API_KEY=sua-api-key-aqui
+   N8N_API_KEY=your-api-key-here
    ```
 
-2. **Execute a aplicação principal:**
+2. **Run the main application:**
    ```bash
    python src/main.py
    ```
 
-3. **Siga as instruções no terminal:**
-   - O programa tentará conectar ao n8n
-   - Listará os workflows disponíveis
-   - Você poderá selecionar quais converter
+3. **Follow instructions in terminal:**
+   - The program will try to connect to n8n
+   - Will list available workflows
+   - You can select which ones to convert
 
-### 3. Teste de Componentes Individuais
+### 3. Individual Component Tests
 
-Você também pode testar componentes específicos usando Python interativo:
+You can also test specific components using interactive Python:
 
 ```python
-# Teste do XML Loader
+# XML Loader test
 from src.xml_loader import XMLLoader
 loader = XMLLoader()
 template = loader.load_language_template('php')
 print(template)
 
-# Teste do Node Mapper
+# Node Mapper test
 from src.node_mapper import NodeMapper
 mapper = NodeMapper(loader)
 # ... etc
 ```
 
-## 📊 Interpretando os Resultados
+## 📊 Interpreting Results
 
-### Teste Automatizado
+### Automated Test
 
-O script `test.py` mostra:
-
-```
-============================================================
-TESTE 1: XML Loader
-============================================================
-✓ Template PHP carregado com sucesso
-  Tamanho: 234 caracteres
-✓ Template de nó 'function' carregado
-✓ Template de nó 'httpRequest' carregado
-
-============================================================
-RESUMO DOS TESTES
-============================================================
-✓ PASSOU: XML Loader
-✓ PASSOU: Node Mapper
-✓ PASSOU: Generator
-✓ PASSOU: Fluxo Completo
-
-Total: 4/4 testes passaram
-🎉 Todos os testes passaram!
-```
-
-### Teste com n8n Real
-
-Se tudo estiver funcionando, você verá:
+The `test.py` script shows:
 
 ```
 ============================================================
-n8ncoding - Conversor de Workflows n8n para Código
+TEST 1: XML Loader
 ============================================================
+✓ PHP template loaded successfully
+  Size: 234 characters
+✓ Node template 'function' loaded
+✓ Node template 'httpRequest' loaded
 
-Conectando ao n8n em: http://localhost:5678
-✓ Conexão estabelecida com sucesso!
-
-Buscando workflows...
-✓ 5 workflow(s) encontrado(s).
-
-Escolha os workflows que deseja converter:
 ============================================================
-[1] Workflow 1 (ID: abc123)
-[2] Workflow 2 (ID: def456)
-...
+TEST SUMMARY
+============================================================
+✓ PASSED: XML Loader
+✓ PASSED: Node Mapper
+✓ PASSED: Generator
+✓ PASSED: Complete Flow
+
+Total: 4/4 tests passed
+🎉 All tests passed!
 ```
 
-## 🔧 Solução de Problemas
+## 🔧 Troubleshooting
 
-### Erro: "Template não encontrado"
+### Error: "Template not found"
 
-**Causa:** Arquivos de template faltando ou caminho incorreto.
+**Cause:** Missing template files or incorrect path.
 
-**Solução:**
-- Verifique se a pasta `templates/` existe
-- Verifique se os arquivos `php.xml`, `function.xml`, etc. existem
-- Execute `python tests/test.py` para verificar
+**Solution:**
+- Check if the `templates/` folder exists
+- Check if files `php.xml`, `function.xml`, etc. exist
+- Run `python tests/test.py` to verify
 
-### Erro: "Não foi possível conectar ao n8n"
+### Error: "Could not connect to n8n"
 
-**Causa:** Servidor n8n não está rodando ou credenciais incorretas.
+**Cause:** n8n server is not running or incorrect credentials.
 
-**Solução:**
-- Verifique se o n8n está rodando: `http://localhost:5678`
-- Verifique o arquivo `.env` com as credenciais corretas
-- Use `python tests/test.py` para testar sem n8n
+**Solution:**
+- Check if n8n is running: `http://localhost:5678`
+- Check the `.env` file with correct credentials
+- Use `python tests/test.py` to test without n8n
 
-### Erro: "ModuleNotFoundError: No module named 'dotenv'"
+### Error: "ModuleNotFoundError: No module named 'dotenv'"
 
-**Causa:** Dependência não instalada.
+**Cause:** Dependency not installed.
 
-**Solução:**
+**Solution:**
 ```bash
 pip install -r requirements.txt
 ```
 
-## 📝 Exemplo de Execução Completa
+## 📝 Complete Execution Example
 
 ```bash
-# 1. Instalar dependências (se ainda não instalou)
+# 1. Install dependencies (if not already installed)
 pip install -r requirements.txt
 
-# 2. Executar testes automatizados
+# 2. Run automated tests
 python tests/test.py
 
-# 3. Se os testes passarem, testar com n8n real
-# (Configure o .env primeiro)
+# 3. If tests pass, test with real n8n
+# (Configure .env first)
 python src/main.py
 ```
 
-## 🎯 Checklist de Testes
+## 🎯 Testing Checklist
 
-Antes de fazer commit, certifique-se de que:
+Before committing, make sure:
 
-- [ ] `python tests/test.py` executa sem erros
-- [ ] Todos os testes passam (4/4)
-- [ ] Arquivo de teste é gerado em `output/`
-- [ ] Templates XML são carregados corretamente
-- [ ] Código PHP gerado está válido
+- [ ] `python tests/test.py` runs without errors
+- [ ] All tests pass (4/4)
+- [ ] Test file is generated in `output/`
+- [ ] XML templates are loaded correctly
+- [ ] Generated PHP code is valid
 
-## 💡 Dicas
+## 💡 Tips
 
-1. **Execute os testes sempre antes de fazer commit**
-2. **Use `test.py` para desenvolvimento rápido** (não precisa de n8n)
-3. **Use `main.py` para testar integração completa** (precisa de n8n)
-4. **Verifique os arquivos gerados em `output/`** após os testes
-
+1. **Always run tests before committing**
+2. **Use `test.py` for rapid development** (no n8n needed)
+3. **Use `main.py` to test complete integration** (needs n8n)
+4. **Check generated files in `output/`** after tests

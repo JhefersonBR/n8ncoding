@@ -6,15 +6,15 @@ ref: env-setup
 permalink: /pt/env-setup/
 ---
 
-# Configuração de Variáveis de Ambiente
+# Environment Variables Setup
 
-O projeto agora suporta o uso de variáveis de ambiente através de arquivos `.env` para manter as credenciais seguras e fora do controle de versão.
+The project now supports the use of environment variables through `.env` files to keep credentials secure and out of version control.
 
-## 📋 Como Configurar
+## 📋 How to Configure
 
-### 1. Criar o arquivo `.env`
+### 1. Create the `.env` file
 
-Copie o arquivo `.env.example` para `.env`:
+Copy the `.env.example` file to `.env`:
 
 ```bash
 # Windows PowerShell
@@ -24,18 +24,18 @@ Copy-Item .env.example .env
 cp .env.example .env
 ```
 
-### 2. Editar o arquivo `.env`
+### 2. Edit the `.env` file
 
-Abra o arquivo `.env` e preencha com suas credenciais:
+Open the `.env` file and fill in your credentials:
 
 ```env
 N8N_URL=http://localhost:5678
-N8N_API_KEY=sua-api-key-real-aqui
+N8N_API_KEY=your-real-api-key-here
 ```
 
-### 3. O arquivo `config/settings.json`
+### 3. The `config/settings.json` file
 
-O arquivo `settings.json` agora usa referências às variáveis de ambiente:
+The `settings.json` file now uses references to environment variables:
 
 ```json
 {
@@ -50,30 +50,29 @@ O arquivo `settings.json` agora usa referências às variáveis de ambiente:
 }
 ```
 
-As variáveis serão automaticamente resolvidas quando o programa executar.
+Variables will be automatically resolved when the program runs.
 
-## 🔒 Segurança
+## 🔒 Security
 
-- ✅ O arquivo `.env` está no `.gitignore` e **não será commitado** no Git
-- ✅ O arquivo `.env.example` pode ser versionado como template
-- ✅ As credenciais ficam apenas no seu ambiente local
+- ✅ The `.env` file is in `.gitignore` and **will not be committed** to Git
+- ✅ The `.env.example` file can be versioned as a template
+- ✅ Credentials stay only in your local environment
 
-## 📝 Variáveis Disponíveis
+## 📝 Available Variables
 
-- `N8N_URL`: URL do servidor n8n (ex: `http://localhost:5678`)
-- `N8N_API_KEY`: Chave de API do n8n
+- `N8N_URL`: n8n server URL (e.g., `http://localhost:5678`)
+- `N8N_API_KEY`: n8n API key
 
-## 🚀 Uso
+## 🚀 Usage
 
-Após configurar o `.env`, execute o programa normalmente:
+After configuring `.env`, run the program normally:
 
 ```bash
 python src/main.py
 ```
 
-O programa carregará automaticamente as variáveis do arquivo `.env` e resolverá as referências no `settings.json`.
+The program will automatically load variables from the `.env` file and resolve references in `settings.json`.
 
-## 💡 Dica
+## 💡 Tip
 
-Se você não criar o arquivo `.env`, o programa ainda funcionará, mas as variáveis `${N8N_URL}` e `${N8N_API_KEY}` serão resolvidas como strings vazias. Nesse caso, você pode preencher manualmente quando solicitado ou editar diretamente o `settings.json`.
-
+If you don't create the `.env` file, the program will still work, but the `${N8N_URL}` and `${N8N_API_KEY}` variables will be resolved as empty strings. In that case, you can fill them manually when prompted or edit `settings.json` directly.
