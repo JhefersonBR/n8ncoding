@@ -1,0 +1,24 @@
+<language>
+    <class>
+        <![CDATA[
+<?php
+
+class {{class_name}} {
+
+    private array $context = [];
+
+    public function run(array $params = []): mixed
+    {
+        $this->context = $params;
+
+        {{steps_calls}}
+
+        return $this->context;
+    }
+
+    {{steps_methods}}
+}
+        ]]>
+    </class>
+</language>
+

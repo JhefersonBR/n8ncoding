@@ -1,0 +1,12 @@
+<node>
+    <name>function</name>
+    <method>
+        <![CDATA[
+private function {{method_name}}(): void
+{
+    {{generated_code}}
+}
+        ]]>
+    </method>
+</node>
+

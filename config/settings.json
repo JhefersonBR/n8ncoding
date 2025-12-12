@@ -1,0 +1,11 @@
+{
+  "n8n": {
+    "url": "${N8N_URL}",
+    "api_key": "${N8N_API_KEY}"
+  },
+  "output": {
+    "path": "output",
+    "language": "php"
+  }
+}
+

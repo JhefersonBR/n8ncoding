@@ -1,0 +1,13 @@
+<node>
+    <name>set</name>
+    <method>
+        <![CDATA[
+private function {{method_name}}(): void
+{
+    // Nó Set - Define valores no contexto
+    {{generated_code}}
+}
+        ]]>
+    </method>
+</node>
+

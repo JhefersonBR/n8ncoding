@@ -1,0 +1,23 @@
+<node>
+    <name>if</name>
+    <method>
+        <![CDATA[
+private function {{method_name}}(): void
+{
+    // Nó IF - Condicional
+    {{generated_code}}
+    
+    if ({{condition}}) {
+        // Caminho verdadeiro
+        {{true_branch}}
+    } else {
+        // Caminho falso
+        {{false_branch}}
+    }
+    
+    $this->context['{{output_key}}'] = $this->context;
+}
+        ]]>
+    </method>
+</node>
+
