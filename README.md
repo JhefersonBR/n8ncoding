@@ -158,6 +158,35 @@ private function {{method_name}}(): void
 2. Use os placeholders `{{class_name}}`, `{{steps_calls}}` e `{{steps_methods}}`
 3. Atualize a configuração para usar a nova linguagem
 
+## 🌿 GitFlow
+
+Este projeto utiliza o padrão **GitFlow** para gerenciamento de branches.
+
+**Branches principais:**
+- `main` - Código em produção
+- `develop` - Código em desenvolvimento
+
+**Branches de suporte:**
+- `feature/` - Novas funcionalidades
+- `release/` - Preparação para releases
+- `hotfix/` - Correções urgentes
+
+📖 Veja [GITFLOW.md](GITFLOW.md) para documentação completa.
+
+**Scripts auxiliares (Linux/Mac):**
+```bash
+./scripts/new-feature.sh nome-da-feature
+./scripts/finish-feature.sh nome-da-feature
+./scripts/new-release.sh versao
+./scripts/finish-release.sh versao
+```
+
+**Scripts auxiliares (Windows PowerShell):**
+```powershell
+.\scripts\new-feature.ps1 nome-da-feature
+.\scripts\finish-feature.ps1 nome-da-feature
+```
+
 ## 📄 Licença
 
 Este projeto é open-source. Consulte o arquivo LICENSE para mais detalhes.
