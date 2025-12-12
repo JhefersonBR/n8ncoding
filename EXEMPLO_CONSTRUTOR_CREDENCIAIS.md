@@ -225,8 +225,8 @@ $workflow = new MeuWorkflow(msg: 'teste');
 - `src/parameter_extractor.py` - Extrai parâmetros do primeiro nó
 - `src/expression_parser.py` - Faz parsing de expressões n8n
 - `templates/credentials/Credentials.php` - Classes de credenciais
-- `src/test_expression_parser.py` - Testes do parser
-- `src/test_complete_feature.py` - Testes completos
+- `tests/test_expression_parser.py` - Testes do parser
+- `tests/test_complete_feature.py` - Testes completos
 
 ## 🚀 Próximos Passos
 

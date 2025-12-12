@@ -4,7 +4,7 @@ Teste para verificar a geração de nomes de métodos em camelCase.
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
 
 from node_mapper import NodeMapper
 from xml_loader import XMLLoader

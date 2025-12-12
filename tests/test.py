@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 # Adiciona o diretório src ao path
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
 
 from xml_loader import XMLLoader
 from generator import Generator
@@ -212,10 +212,13 @@ def test_full_workflow():
         print("❌ Erro ao gerar código")
         return False
     
-    # Salva arquivo de teste
-    output_path = generator.save_generated_code(workflow, generated_code)
+    # Obtém o caminho do arquivo antes de salvar
+    output_path = generator.folder_structure.get_output_file_path(workflow, generator.language)
     
-    if output_path:
+    # Salva arquivo de teste
+    saved = generator.save_generated_code(workflow, generated_code)
+    
+    if saved:
         print(f"✓ Arquivo salvo: {output_path}")
         
         # Verifica se arquivo existe
