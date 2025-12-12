@@ -212,7 +212,16 @@ This project uses the **GitFlow** pattern for branch and release management.
 
 ## 📄 License
 
-This project is open-source. See the LICENSE file for details.
+This project is licensed under the **GNU Lesser General Public License v3.0 (LGPL-3.0)**.
+
+This license allows you to:
+- ✅ Use the code in proprietary projects
+- ✅ Redistribute the code
+- ✅ Modify the code
+
+However, if you modify the library itself, you must release those modifications under the LGPL-3.0 license. This ensures the project remains open-source while allowing integration into proprietary software.
+
+See the [LICENSE](LICENSE) file for the full license text.
 
 ## 🤝 Contributing
 
