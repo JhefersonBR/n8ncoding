@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2025-12-12
+
+### Changed
+- **All root `.md` files translated to English**
+  - `README.md` - Fully translated to English
+  - `USAGE.md` (formerly `EXEMPLO_USO.md`) - Translated to English
+  - `ENV_SETUP.md` - Translated to English
+  - `CONTRIBUTING.md` - Translated to English
+  - `GITFLOW.md` - Translated to English
+  - `TESTING.md` (formerly `TESTES.md`) - Translated to English
+  - `AI_AGENT_EXAMPLE.md` (formerly `EXEMPLO_AI_AGENT.md`) - Translated to English
+  - `CREDENTIALS_CONSTRUCTOR_EXAMPLE.md` (formerly `EXEMPLO_CONSTRUTOR_CREDENCIAIS.md`) - Translated to English
+  - `AI_AGENT_PHP_TEMPLATE.md` (formerly `EXEMPLO_AI_AGENT_PHP.md`) - Translated to English
+  - Portuguese translations maintained in GitHub Pages (`docs/pt/`)
+
+## [1.1.0] - 2024-12-04
+
 ### Added
 - **Multilingual documentation on GitHub Pages**
   - Complete Jekyll structure with support for multiple languages (English and Portuguese)
@@ -36,16 +53,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Execution time tracking
 
 ### Changed
-- **All root `.md` files translated to English**
-  - `README.md` - Fully translated to English
-  - `USAGE.md` (formerly `EXEMPLO_USO.md`) - Translated to English
-  - `ENV_SETUP.md` - Translated to English
-  - `CONTRIBUTING.md` - Translated to English
-  - `GITFLOW.md` - Translated to English
-  - `TESTING.md` (formerly `TESTES.md`) - Translated to English
-  - `AI_AGENT_EXAMPLE.md` (formerly `EXEMPLO_AI_AGENT.md`) - Translated to English
-  - `CREDENTIALS_CONSTRUCTOR_EXAMPLE.md` (formerly `EXEMPLO_CONSTRUTOR_CREDENCIAIS.md`) - Translated to English
-  - Portuguese translations maintained in GitHub Pages (`docs/pt/`)
 - `config/settings.json` now uses environment variable references
 - `.gitignore` updated to ignore only generated files in `output/`
 
@@ -62,4 +69,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Templates for nodes: function, httpRequest, set, if
 - Base template for PHP
 
-[1.0.0]: https://github.com/seu-usuario/n8ncoding/releases/tag/v1.0.0
+[1.2.0]: https://github.com/JhefersonBR/n8ncoding/releases/tag/v1.2.0
+[1.1.0]: https://github.com/JhefersonBR/n8ncoding/releases/tag/v1.1.0
+[1.0.0]: https://github.com/JhefersonBR/n8ncoding/releases/tag/v1.0.0
